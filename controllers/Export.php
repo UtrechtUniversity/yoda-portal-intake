@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * Class Export required for exporting of reports
+ */
+class Export extends MY_Controller {
+    public $user = NULL;
+    public $intake_path = '';
+    public $studies=array();
+
+    public function __construct() {
+        parent::__construct();
+
+        $this->load->config('config');
+        $this->load->model('yodaprods');
+        $this->load->model('user');
+        $this->load->model('dataset');
+
+        $this->studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
+
+        $this->load->helper('yoda_intake');
+    }
+
+    public function download($studyID=null)
+    {
+       $this->output->set_header('Content-type: text/csv');
+       $this->output->set_header('Content-Disposition: attachment;filename="' . $studyID . '.csv"');
+
+        if(!$studyID){
+            echo '"Valid study required"';
+            return FALSE;
+        }
+
+        if(!$this->user->validateStudy($this->studies, $studyID)){
+            echo 'Invalid study';
+            return FALSE;
+        }
+
+        if(!$this->yodaprods->isGroupMember($this->rodsuser->getRodsAccount(), $this->user->PERM_GroupDataManager . $studyID, $this->rodsuser->getUsername())){
+            echo "You have no rights for this report of this study";
+            return FALSE;
+        }
+
+        $exportData = $this->dataset->exportVaultDatasetInfo($studyID);
+
+        echo '"Study"';
+        echo ",";
+        echo '"Wave"';
+        echo ",";
+        echo '"ExpType"';
+        echo ",";
+        echo '"Pseudo"';
+        echo ",";
+        echo '"Version"';
+        echo ",";
+        echo '"ToVaultDay"';
+        echo ",";
+        echo '"ToVaultMonth"';
+        echo ",";
+        echo '"ToVaultYear"';
+        echo ",";
+        echo '"DatasetSize"';
+        echo ",";
+        echo '"DatasetFiles"';
+        echo "\r\n";
+
+        foreach($exportData as $data) {
+            echo $this->_expFormatString($studyID);
+            echo ",";
+            echo $this->_expFormatString($data['wave']);
+            echo ",";
+            echo $this->_expFormatString($data['experiment_type']);
+            echo ",";
+            echo $this->_expFormatString($data['pseudocode']);
+            echo ",";
+            echo $this->_expFormatString($data['version']);
+            echo ",";
+            echo date('j,n,Y', $data['dataset_date_created']);
+            echo ",";
+            echo $data['totalFileSize'];
+            echo ",";
+            echo $data['totalFiles'];
+            echo "\r\n";
+        }
+   }
+
+    private function _expFormatString($string)
+    {
+        return '"' . $string . '"';
+    }
+}

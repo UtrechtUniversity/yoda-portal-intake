@@ -1,0 +1,1 @@
+<button data-url="<?php echo $e->url; ?>" data-toggle="modal" data-target="#confirm-delete" value="<?php echo $e->value;?>" id=" <?php echo $e->id;?>" type="button" class="btn btn-danger" name="<?php echo $e->id;?>"><span class="glyphicon glyphicon-remove"></span> <?php echo $e->label;?></button>

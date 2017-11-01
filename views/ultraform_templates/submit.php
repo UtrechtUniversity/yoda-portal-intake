@@ -1,0 +1,1 @@
+<button id="<?php echo $e->id;?>" type="submit" class="btn btn-info tiptip vanilla-submit" name="<?php echo $e->name;?>"><span class="glyphicon glyphicon-log-in"></span> <?php echo $e->label;?></button>
