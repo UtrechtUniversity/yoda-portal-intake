@@ -39,19 +39,32 @@ class Intake extends MY_Controller
             }
         }
 
-        if(!$this->user->validateStudy($this->studies, $studyID)){
-            return showErrorOnPermissionExceptionByValidUser($this,'ACCESS_INVALID_STUDY','intake/intake/index');
-        }
+        // kill value in session and only add studyIDs that the user actually has rights to
+        $this->session->unset_userdata('studyID');
 
-        // study is validated. Put in session.
-        $this->session->set_userdata('studyID',$studyID);
+        $errorAlreadySet = false; // to be able to have some order/priority in
+        $rightsForStudy = true;
+
+        if(!$this->user->validateStudy($this->studies, $studyID)){
+            showErrorOnPermissionExceptionByValidUser($this, 'ACCESS_INVALID_STUDY', 'intake/intake/index');
+            $errorAlreadySet = true;
+            $rightsForStudy = false;
+        }
 
         // get study dependant rights for current user.
         $this->permissions = $this->user->getIntakeStudyPermissions($studyID);
 
         if(!($this->permissions->assistant OR $this->permissions->manager)){
             // No access rights for this particular module
-            return showErrorOnPermissionExceptionByValidUser($this,'ACCESS_NO_ACCESS_ALLOWED', 'intake/intake/index');
+            if (!$errorAlreadySet) {
+                showErrorOnPermissionExceptionByValidUser($this, 'ACCESS_NO_ACCESS_ALLOWED', 'intake/intake/index'); // Dit gaat over no access voor deze study
+            }
+            $rightsForStudy = false;
+        }
+
+        // study is validated. Put in session.
+        if ($studyID AND $rightsForStudy) {
+            $this->session->set_userdata('studyID', $studyID);
         }
 
         $this->data['permissions']=$this->permissions;
@@ -74,7 +87,8 @@ class Intake extends MY_Controller
 
         if($studyFolder AND !in_array($studyFolder,$validFolders)){
             // invalid folder for this study
-            return showErrorOnPermissionExceptionByValidUser($this, 'ACCESS_INVALID_FOLDER', 'intake/intake/index');
+            //echo '<br>invalid folder in valid study';
+            showErrorOnPermissionExceptionByValidUser($this, 'ACCESS_INVALID_FOLDER', 'intake/intake/index');
         }
 
         if ($studyFolder) { // change the actual folder when person selected a different point of reference.

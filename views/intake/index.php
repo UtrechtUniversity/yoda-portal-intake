@@ -1,7 +1,7 @@
 <?php
     // presentable errors
     $lang['ACCESS_INVALID_STUDY']	    = 'This is an invalid study!';
-    $lang['ACCESS_NO_ACCESS_ALLOWED']	= 'Access is not allowed for this study!';
+    $lang['ACCESS_NO_ACCESS_ALLOWED']	= 'Access is not allowed!';  /// dit gaat over de studie
     $lang['ACCESS_INVALID_FOLDER']	= 'This is an invalid folder for this study!';
     $lang['ACCESS_NO_DATAMANAGER']	= 'You have no datamanager rights on any study!';
 
@@ -40,6 +40,11 @@
         </div>
     </div>
 
+<?php  $alertData = $this->session->userdata('alertOnPageReload');
+        $this->session->unset_userdata('alertOnPageReload');
+?>
+
+<?php if (!$alertData): ?>
     <div class="row page-header" style="margin-top:0px;">
         <div class="col-sm-6">
                 <h1>
@@ -57,8 +62,11 @@
             </div>
         </div>
     </div>
+<?php endif; ?>
 
-<?php if(($alertData = $this->session->userdata('alertOnPageReload'))): ?>
+<?php // kept seperately as this are maybe not mutually exclusive and this might change in the future ?>
+
+<?php if($alertData): ?>
     <div class="row">
         <div class="alert alert-<?php echo $alertData->alertType; ?>">
             <button type="button" class="close" data-hide="alert">&times;</button>
@@ -70,10 +78,11 @@
                 <?php endif;  ?>
             </div>
         </div>
-        <?php $this->session->unset_userdata('alertOnPageReload'); ?>
+
     </div>
 <?php endif; ?>
 
+<?php if (substr($alertData->alertNr,0,6)!='ACCESS'): ?>
 
     <div class="row" id="toprow">
         <div class="btn-group">
@@ -302,7 +311,6 @@
             <?php include "snippets/table_files_unrecognised.php"; ?>
         <?php endif; ?>
 
-
     </div>
 
     <div id="select-generic-modal" class="modal fade"  tabindex="-2" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -321,3 +329,5 @@
             </div>
         </div>
     </div>
+
+<?php endif; ?>
