@@ -346,7 +346,7 @@ class Dataset {
             "COL_DATA_NAME" => NULL,
             "COL_COLL_NAME" => NULL,
             "COL_COLL_CREATE_TIME" => NULL,
-            "COL_COLL_OWNER_NAME" => NULL,
+            "COL_D_OWNER_NAME" => NULL
         );
 
         $select = new RODSGenQueSelFlds(array_keys($iRodsColumns), array_keys($iRodsColumns));
@@ -381,7 +381,7 @@ class Dataset {
                         'path' => $recordData["COL_COLL_NAME"][$i],
                         'error' => $erroneousText,
                         'date' => $recordData["COL_COLL_CREATE_TIME"][$i],
-                        'creator' => $recordData["COL_COLL_OWNER_NAME"][$i],
+                        'creator' => $recordData["COL_D_OWNER_NAME"][$i],
                         'pseudocode' => $pseudocode,
                         'experiment_type' => $experiment_type,
                         'wave' => $wave,
