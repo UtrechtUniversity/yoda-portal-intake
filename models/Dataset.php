@@ -303,7 +303,7 @@ class Dataset {
             "COL_DATA_NAME" => NULL,
             "COL_COLL_NAME" => NULL
         );
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns), array_keys($iRodsColumns));
+        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
 
         $condition = new RODSGenQueConds();
         $condition->add('COL_COLL_NAME', 'like',$referencePath.'%');
@@ -349,7 +349,7 @@ class Dataset {
             "COL_D_OWNER_NAME" => NULL
         );
 
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns), array_keys($iRodsColumns));
+        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
 
         $condition = new RODSGenQueConds();
         $condition->add('COL_COLL_NAME', 'like', $referencePath.'%');
@@ -410,7 +410,7 @@ class Dataset {
             "COL_META_DATA_ATTR_VALUE" => NULL,
             "COL_META_DATA_ATTR_NAME" => NULL,
         );
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns), array_keys($iRodsColumns));
+        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
 
         $condition = new RODSGenQueConds();
         $condition->add('COL_COLL_NAME', '=',$filePath);
@@ -449,7 +449,7 @@ class Dataset {
             "COL_COLL_NAME" => NULL
         );
 
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns), array_keys($iRodsColumns));
+        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
 
         $condition = new RODSGenQueConds();
         $condition->add('COL_COLL_NAME', 'like', $referencePath . '%');
@@ -483,7 +483,7 @@ class Dataset {
             "COL_COLL_NAME" => NULL,
         );
 
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns), array_keys($iRodsColumns));
+        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
 
         $condition = new RODSGenQueConds();
         $condition->add('COL_COLL_NAME', 'like', $referencePath . '/%');
@@ -517,7 +517,7 @@ class Dataset {
             "COL_COLL_NAME" => NULL,
         );
 
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns), array_keys($iRodsColumns));
+        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
 
         $condition = new RODSGenQueConds();
         $condition->add('COL_COLL_NAME', '=', $referencePath);
