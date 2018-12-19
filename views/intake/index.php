@@ -82,7 +82,7 @@
     </div>
 <?php endif; ?>
 
-<?php if (substr($alertData->alertNr,0,6)!='ACCESS'): ?>
+<?php if (!isset($alertData->alertNr) || substr($alertData->alertNr,0,6)!='ACCESS'): ?>
 
     <div class="row" id="toprow">
         <div class="btn-group">

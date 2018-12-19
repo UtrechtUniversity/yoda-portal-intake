@@ -74,7 +74,8 @@ class Intake extends MY_Controller
         // study dependant intake path.
         $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
-        $dir = new ProdsDir($this->rodsuser->getRodsAccount(), $this->intake_path);
+        $rodsAccount = $this->rodsuser->getRodsAccount();
+        $dir = new ProdsDir($rodsAccount, $this->intake_path);
 
         $validFolders = array();
         foreach($dir->getChildDirs() as $folder){
