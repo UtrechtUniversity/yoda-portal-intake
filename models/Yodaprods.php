@@ -165,7 +165,7 @@ class YodaProds  {
     static public function isGroupMember($iRodsAccount,$groupName, $userName){
         $ruleBody = "
             myRule {
-                uuGroupUserExists(*group, *user, *member);
+                uuGroupUserExists(*group, *user, false, *member);
                 *member = str(*member);
         }";
 
