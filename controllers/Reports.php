@@ -91,6 +91,7 @@ class Reports extends MY_Controller
             'activeModule'   => 'intake',
             'moduleGlyph' => $this->config->item('module-glyph'),
             'studies' => $this->studies,
+            'intakePath' => $this->intake_path,
             'datasetTypeCounts' => $this->dataset->vaultDatasetCountsPerStudy($studyID),
             'aggregatedInfo' => $this->dataset->vaultAggregatedInfo($studyID),
             'studyID' => $studyID,

@@ -347,7 +347,7 @@ class YodaProds  {
      */
     public function query($iRodsAccount, $columns, $referencePath, $specificMetaConditionsOnColumn='', $specificMetaConditions=array())
     {
-        $select = new RODSGenQueSelFlds(array_keys($columns), array_keys($columns));
+        $select = new RODSGenQueSelFlds(array_keys($columns));
 
         $condition = new RODSGenQueConds();
         $condition->add('COL_COLL_NAME', 'like',$referencePath);
