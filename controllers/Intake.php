@@ -471,7 +471,8 @@ class Intake extends MY_Controller
             return;
         }
 
-        $home = new ProdsDir($this->rodsuser->getRodsAccount(), $strPath);
+        $rodsAccount = $this->rodsuser->getRodsAccount();
+        $home = new ProdsDir($rodsAccount, $strPath);
 
         $pathItems = array();
         $this->_getNewPathInfo($pathItems, $home, $parentNodeId="0", $datasetID);
@@ -481,7 +482,7 @@ class Intake extends MY_Controller
         //$this->data['content'] = 'intake/intake/index';
         $this->data['tbl_id'] = $tbl_id;
 
-        $scannedBy='';
+        $scannedByWhen = '';
         // prepare data for the error, warning and comments  table.
         $datasetErrors = array();
         $datasetWarnings = array();
