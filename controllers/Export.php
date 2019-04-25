@@ -23,8 +23,8 @@ class Export extends MY_Controller {
 
     public function download($studyID=null)
     {
-       $this->output->set_header('Content-type: text/csv');
-       $this->output->set_header('Content-Disposition: attachment;filename="' . $studyID . '.csv"');
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $studyID . '.csv"');
 
         if(!$studyID){
             echo '"Valid study required"';
