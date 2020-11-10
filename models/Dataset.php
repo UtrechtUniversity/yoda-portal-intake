@@ -209,7 +209,7 @@ class Dataset {
                 $datasetCount[$index]++;
 
                 if(($meta['dataset_date_created']-$refLastMonth) >= 0) {
-                    $datasetGrowth[$index]++;
+                     $datasetGrowth[$index]++;
                 }
 
                 if(!in_array($meta['pseudocode'], $pseudoCodes[$index])) {
@@ -296,40 +296,40 @@ class Dataset {
      * @param $referencePath
      * @return int
      */
-    function getIntakeFileCount($referencePath)
-    {
-        // Get all files that have a scanned tag
-        $iRodsColumns = array(
-            "COL_DATA_NAME" => NULL,
-            "COL_COLL_NAME" => NULL
-        );
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
-
-        $condition = new RODSGenQueConds();
-        $condition->add('COL_COLL_NAME', 'like',$referencePath.'%');
-        $data = array();
-
-        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
-            $select,
-            $condition,
-            $data
-        );
-
-        // intake files have to be matched against the exclusion pattern to be counted
-        $file_exclusion_patterns = explode(';',get_instance()->config->item('file_exclusion_patterns'));
-
-        $fileCount = 0;
-
-        if( $data['recordCount']) {
-            $recordData = $data['recordValues'];
-            for($i=0; $i<$data['recordCount']; $i++) {
-                if($this->_fileIsToBeViewed( $recordData["COL_DATA_NAME"][$i], $file_exclusion_patterns)) {
-                    $fileCount++;
-                }
-            }
-        }
-        return $fileCount;
-    }
+//    function getIntakeFileCount($referencePath)
+//    {
+//        // Get all files that have a scanned tag
+//        $iRodsColumns = array(
+//            "COL_DATA_NAME" => NULL,
+//            "COL_COLL_NAME" => NULL
+//        );
+//        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
+//
+//        $condition = new RODSGenQueConds();
+//        $condition->add('COL_COLL_NAME', 'like',$referencePath.'%');
+//        $data = array();
+//
+//        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
+//            $select,
+//            $condition,
+//            $data
+//        );
+//
+//        // intake files have to be matched against the exclusion pattern to be counted
+//        $file_exclusion_patterns = explode(';',get_instance()->config->item('file_exclusion_patterns'));
+//
+//        $fileCount = 0;
+//
+//        if( $data['recordCount']) {
+//            $recordData = $data['recordValues'];
+//            for($i=0; $i<$data['recordCount']; $i++) {
+//                if($this->_fileIsToBeViewed( $recordData["COL_DATA_NAME"][$i], $file_exclusion_patterns)) {
+//                    $fileCount++;
+//                }
+//            }
+//        }
+//        return $fileCount;
+//    }
 
     /**
      * Collect the files that hold the attribute 'unrecognised'.
@@ -338,61 +338,61 @@ class Dataset {
      * @param $referencePath
      * @param $erroneousFiles
      */
-    function getErroneousIntakeFiles($referencePath, &$erroneousFiles)
-    {
-        $erroneousText = 'Experiment type, wave or pseudocode is missing from path';
-        // Step through collections
-        $iRodsColumns = array(
-            "COL_DATA_NAME" => NULL,
-            "COL_COLL_NAME" => NULL,
-            "COL_COLL_CREATE_TIME" => NULL,
-            "COL_D_OWNER_NAME" => NULL
-        );
-
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
-
-        $condition = new RODSGenQueConds();
-        $condition->add('COL_COLL_NAME', 'like', $referencePath.'%');
-        $condition->add('COL_META_DATA_ATTR_NAME','=', 'unrecognized');
-
-        $data = array();
-        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
-            $select,
-            $condition,
-            $data
-        );
-
-        // For excluding files that match the exclusion pattern(s)
-        $file_exclusion_patterns = explode(';',get_instance()->config->item('file_exclusion_patterns'));
-
-        if($data['recordCount']) {
-            $recordData = $data['recordValues'];
-            for($i=0; $i<$data['recordCount']; $i++) {
-                if($this->_fileIsToBeViewed( $recordData["COL_DATA_NAME"][$i], $file_exclusion_patterns)) {
-                    $metaData = array();
-                    $this->getMetaInfoOnFile($recordData["COL_COLL_NAME"][$i], $recordData["COL_DATA_NAME"][$i], $metaData);
-
-                    $pseudocode = isset($metaData['pseudocode']) ? $metaData['pseudocode'] : '';
-                    $experiment_type = isset($metaData['experiment_type']) ? $metaData['experiment_type'] : '';
-                    $wave = isset($metaData['wave']) ? $metaData['wave'] : '';
-                    $version = isset($metaData['version']) ? $metaData['version'] : '';
-
-                    $dataRow = (object)array('name' => $recordData["COL_DATA_NAME"][$i],
-                        'path' => $recordData["COL_COLL_NAME"][$i],
-                        'error' => $erroneousText,
-                        'date' => $recordData["COL_COLL_CREATE_TIME"][$i],
-                        'creator' => $recordData["COL_D_OWNER_NAME"][$i],
-                        'pseudocode' => $pseudocode,
-                        'experiment_type' => $experiment_type,
-                        'wave' => $wave,
-                        'version' => $version
-                    );
-
-                    $erroneousFiles[] = $dataRow;
-                }
-            }
-        }
-    }
+//    function getErroneousIntakeFiles($referencePath, &$erroneousFiles)
+//    {
+//        $erroneousText = 'Experiment type, wave or pseudocode is missing from path';
+//        // Step through collections
+//        $iRodsColumns = array(
+//            "COL_DATA_NAME" => NULL,
+//            "COL_COLL_NAME" => NULL,
+//            "COL_COLL_CREATE_TIME" => NULL,
+//            "COL_D_OWNER_NAME" => NULL
+//        );
+//
+//        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
+//
+//        $condition = new RODSGenQueConds();
+//        $condition->add('COL_COLL_NAME', 'like', $referencePath.'%');
+//        $condition->add('COL_META_DATA_ATTR_NAME','=', 'unrecognized');
+//
+//        $data = array();
+//        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
+//            $select,
+//            $condition,
+//            $data
+//        );
+//
+//        // For excluding files that match the exclusion pattern(s)
+//        $file_exclusion_patterns = explode(';',get_instance()->config->item('file_exclusion_patterns'));
+//
+//        if($data['recordCount']) {
+//            $recordData = $data['recordValues'];
+//            for($i=0; $i<$data['recordCount']; $i++) {
+//                if($this->_fileIsToBeViewed( $recordData["COL_DATA_NAME"][$i], $file_exclusion_patterns)) {
+//                    $metaData = array();
+//                    $this->getMetaInfoOnFile($recordData["COL_COLL_NAME"][$i], $recordData["COL_DATA_NAME"][$i], $metaData);
+//
+//                    $pseudocode = isset($metaData['pseudocode']) ? $metaData['pseudocode'] : '';
+//                    $experiment_type = isset($metaData['experiment_type']) ? $metaData['experiment_type'] : '';
+//                    $wave = isset($metaData['wave']) ? $metaData['wave'] : '';
+//                    $version = isset($metaData['version']) ? $metaData['version'] : '';
+//
+//                    $dataRow = (object)array('name' => $recordData["COL_DATA_NAME"][$i],
+//                        'path' => $recordData["COL_COLL_NAME"][$i],
+//                        'error' => $erroneousText,
+//                        'date' => $recordData["COL_COLL_CREATE_TIME"][$i],
+//                        'creator' => $recordData["COL_D_OWNER_NAME"][$i],
+//                        'pseudocode' => $pseudocode,
+//                        'experiment_type' => $experiment_type,
+//                        'wave' => $wave,
+//                        'version' => $version
+//                    );
+//
+//                    $erroneousFiles[] = $dataRow;
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Get the meta relevant for the intake module for a specific file.
@@ -404,149 +404,149 @@ class Dataset {
      * @param $filePath
      * @param $fileName
      */
-    function getMetaInfoOnFile($filePath, $fileName, &$data)
-    {
-        $iRodsColumns = array(
-            "COL_META_DATA_ATTR_VALUE" => NULL,
-            "COL_META_DATA_ATTR_NAME" => NULL,
-        );
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
-
-        $condition = new RODSGenQueConds();
-        $condition->add('COL_COLL_NAME', '=',$filePath);
-        $condition->add('COL_DATA_NAME', '=',$fileName);
-
-        $condition->add('COL_META_DATA_ATTR_NAME','=','experiment_type', array(
-            array('op'=>'=','val'=>'pseudocode'),
-            array('op'=>'=','val'=>'version'),
-            array('op'=>'=','val'=>'wave'),
-        ));
-
-        $data = array();
-        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
-            $select,
-            $condition,
-            $data
-        );
-
-        if($data['recordCount']) {
-            $recordData = $data['recordValues'];
-            for($i=0; $i<$data['recordCount']; $i++) {
-                $data[$recordData["COL_META_DATA_ATTR_NAME"][$i]] = $recordData["COL_META_DATA_ATTR_VALUE"][$i];            }
-        }
-    }
+//    function getMetaInfoOnFile($filePath, $fileName, &$data)
+//    {
+//        $iRodsColumns = array(
+//            "COL_META_DATA_ATTR_VALUE" => NULL,
+//            "COL_META_DATA_ATTR_NAME" => NULL,
+//        );
+//        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
+//
+//        $condition = new RODSGenQueConds();
+//        $condition->add('COL_COLL_NAME', '=',$filePath);
+//        $condition->add('COL_DATA_NAME', '=',$fileName);
+//
+//        $condition->add('COL_META_DATA_ATTR_NAME','=','experiment_type', array(
+//            array('op'=>'=','val'=>'pseudocode'),
+//            array('op'=>'=','val'=>'version'),
+//            array('op'=>'=','val'=>'wave'),
+//        ));
+//
+//        $data = array();
+//        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
+//            $select,
+//            $condition,
+//            $data
+//        );
+//
+//        if($data['recordCount']) {
+//            $recordData = $data['recordValues'];
+//            for($i=0; $i<$data['recordCount']; $i++) {
+//                $data[$recordData["COL_META_DATA_ATTR_NAME"][$i]] = $recordData["COL_META_DATA_ATTR_VALUE"][$i];            }
+//        }
+//    }
 
     /**
      * @param $referencePath
      * @param array $dataSets
      * @return bool
      */
-    function getIntakeDataSets($referencePath, &$dataSets = array())
-    {
-        // Step through collections
-        $iRodsColumns = array(
-            "COL_META_COLL_ATTR_VALUE" => NULL,
-            "COL_COLL_NAME" => NULL
-        );
-
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
-
-        $condition = new RODSGenQueConds();
-        $condition->add('COL_COLL_NAME', 'like', $referencePath . '%');
-        $condition->add('COL_META_COLL_ATTR_NAME', '=', 'dataset_toplevel');
-
-        $data = array();
-        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
-            $select,
-            $condition,
-            $data
-        );
-
-        if ($data['recordCount']) {
-            $recordData = $data['recordValues'];
-            for ($i = 0; $i < $data['recordCount']; $i++) {
-                $dataSetInfo = array('dataset_id' => $recordData["COL_META_COLL_ATTR_VALUE"][$i],
-                    'path' => $recordData["COL_COLL_NAME"][$i]
-                );
-
-                get_instance()->yodaprods->getMetaDataForIntakeDataset(get_instance()->rodsuser->getRodsAccount(),
-                    $recordData["COL_META_COLL_ATTR_VALUE"][$i],
-                    $dataSetInfo);
-
-                $dataSets[] = new Dataset($dataSetInfo);
-            }
-        }
-
-        // Collect datasets from files
-        $iRodsColumns = array(
-            "COL_META_DATA_ATTR_VALUE" => NULL,
-            "COL_COLL_NAME" => NULL,
-        );
-
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
-
-        $condition = new RODSGenQueConds();
-        $condition->add('COL_COLL_NAME', 'like', $referencePath . '/%');
-        $condition->add('COL_META_DATA_ATTR_NAME', '=', 'dataset_toplevel');
-
-        $data = array();
-        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
-            $select,
-            $condition,
-            $data
-        );
-
-        if ($data['recordCount']) {
-            $recordData = $data['recordValues'];
-            for ($i = 0; $i < $data['recordCount']; $i++) {
-                $dataSetInfo = array('dataset_id' => $recordData["COL_META_DATA_ATTR_VALUE"][$i],
-                    'path' => $recordData["COL_COLL_NAME"][$i]
-                );
-
-                get_instance()->yodaprods->getMetaDataForIntakeDataset(get_instance()->rodsuser->getRodsAccount(),
-                    $recordData["COL_META_DATA_ATTR_VALUE"][$i],
-                    $dataSetInfo);
-
-                $dataSets[] = new Dataset($dataSetInfo);
-            }
-        }
-
-        // Collect data from files that are located in the folder itself as these fall out the query above.
-        $iRodsColumns = array(
-            "COL_META_DATA_ATTR_VALUE" => NULL,
-            "COL_COLL_NAME" => NULL,
-        );
-
-        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
-
-        $condition = new RODSGenQueConds();
-        $condition->add('COL_COLL_NAME', '=', $referencePath);
-        $condition->add('COL_META_DATA_ATTR_NAME', '=', 'dataset_toplevel');
-
-        $data = array();
-        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
-            $select,
-            $condition,
-            $data
-        );
-
-        if ($data['recordCount']) {
-            $recordData = $data['recordValues'];
-            for ($i = 0; $i < $data['recordCount']; $i++) {
-                $dataSetInfo = array('dataset_id' => $recordData["COL_META_DATA_ATTR_VALUE"][$i],
-                    'path' => $recordData["COL_COLL_NAME"][$i]
-                );
-
-                get_instance()->yodaprods->getMetaDataForIntakeDataset(get_instance()->rodsuser->getRodsAccount(),
-                    $recordData["COL_META_DATA_ATTR_VALUE"][$i],
-                    $dataSetInfo);
-
-                $dataSets[] = new Dataset($dataSetInfo);
-            }
-        }
-
-        return true;
-    }
+//    function getIntakeDataSets($referencePath, &$dataSets = array())
+//    {
+//        // Step through collections
+//        $iRodsColumns = array(
+//            "COL_META_COLL_ATTR_VALUE" => NULL,
+//            "COL_COLL_NAME" => NULL
+//        );
+//
+//        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
+//
+//        $condition = new RODSGenQueConds();
+//        $condition->add('COL_COLL_NAME', 'like', $referencePath . '%');
+//        $condition->add('COL_META_COLL_ATTR_NAME', '=', 'dataset_toplevel');
+//
+//        $data = array();
+//        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
+//            $select,
+//            $condition,
+//            $data
+//        );
+//
+//        if ($data['recordCount']) {
+//            $recordData = $data['recordValues'];
+//            for ($i = 0; $i < $data['recordCount']; $i++) {
+//                $dataSetInfo = array('dataset_id' => $recordData["COL_META_COLL_ATTR_VALUE"][$i],
+//                    'path' => $recordData["COL_COLL_NAME"][$i]
+//                );
+//
+//                get_instance()->yodaprods->getMetaDataForIntakeDataset(get_instance()->rodsuser->getRodsAccount(),
+//                    $recordData["COL_META_COLL_ATTR_VALUE"][$i],
+//                    $dataSetInfo);
+//
+//                $dataSets[] = new Dataset($dataSetInfo);
+//            }
+//        }
+//
+//        // Collect datasets from files
+//        $iRodsColumns = array(
+//            "COL_META_DATA_ATTR_VALUE" => NULL,
+//            "COL_COLL_NAME" => NULL,
+//        );
+//
+//        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
+//
+//        $condition = new RODSGenQueConds();
+//        $condition->add('COL_COLL_NAME', 'like', $referencePath . '/%');
+//        $condition->add('COL_META_DATA_ATTR_NAME', '=', 'dataset_toplevel');
+//
+//        $data = array();
+//        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
+//            $select,
+//            $condition,
+//            $data
+//        );
+//
+//        if ($data['recordCount']) {
+//            $recordData = $data['recordValues'];
+//            for ($i = 0; $i < $data['recordCount']; $i++) {
+//                $dataSetInfo = array('dataset_id' => $recordData["COL_META_DATA_ATTR_VALUE"][$i],
+//                    'path' => $recordData["COL_COLL_NAME"][$i]
+//                );
+//
+//                get_instance()->yodaprods->getMetaDataForIntakeDataset(get_instance()->rodsuser->getRodsAccount(),
+//                    $recordData["COL_META_DATA_ATTR_VALUE"][$i],
+//                    $dataSetInfo);
+//
+//                $dataSets[] = new Dataset($dataSetInfo);
+//            }
+//        }
+//
+//        // Collect data from files that are located in the folder itself as these fall out the query above.
+//        $iRodsColumns = array(
+//            "COL_META_DATA_ATTR_VALUE" => NULL,
+//            "COL_COLL_NAME" => NULL,
+//        );
+//
+//        $select = new RODSGenQueSelFlds(array_keys($iRodsColumns));
+//
+//        $condition = new RODSGenQueConds();
+//        $condition->add('COL_COLL_NAME', '=', $referencePath);
+//        $condition->add('COL_META_DATA_ATTR_NAME', '=', 'dataset_toplevel');
+//
+//        $data = array();
+//        get_instance()->yodaprods->queryGeneral(get_instance()->rodsuser->getRodsAccount(),
+//            $select,
+//            $condition,
+//            $data
+//        );
+//
+//        if ($data['recordCount']) {
+//            $recordData = $data['recordValues'];
+//            for ($i = 0; $i < $data['recordCount']; $i++) {
+//                $dataSetInfo = array('dataset_id' => $recordData["COL_META_DATA_ATTR_VALUE"][$i],
+//                    'path' => $recordData["COL_COLL_NAME"][$i]
+//                );
+//
+//                get_instance()->yodaprods->getMetaDataForIntakeDataset(get_instance()->rodsuser->getRodsAccount(),
+//                    $recordData["COL_META_DATA_ATTR_VALUE"][$i],
+//                    $dataSetInfo);
+//
+//                $dataSets[] = new Dataset($dataSetInfo);
+//            }
+//        }
+//
+//        return true;
+//    }
 
     /**
      * @param $fileName

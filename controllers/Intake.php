@@ -20,7 +20,21 @@ class Intake extends MY_Controller
         $this->load->model('user');
         $this->load->model('dataset');
 
-        $this->studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
+        //$this->studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
+
+        //print_r($this->studies);
+
+        $this->load->library('api');
+
+//        $this->studies = $this->intakeapi->intake_list_studies();
+//
+//        print_r($this->studies);
+//        echo '<hr>';
+//
+//        print_r($this->api->call('intake_list_studies')->data);
+//        echo '<hr>';
+
+        $this->studies = $this->api->call('intake_list_studies')->data;
 
         $this->load->helper('yoda_intake');
     }
@@ -96,8 +110,14 @@ class Intake extends MY_Controller
             $dir = new ProdsDir($this->rodsuser->getRodsAccount(), $this->intake_path . '/' . $studyFolder);
         }
 
-        $dataSets = array();
-        $this->dataset->getIntakeDataSets($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''), $dataSets);
+        //$dataSets = array();
+        //$this->dataset->getIntakeDataSets($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''), $dataSets);
+
+        $dataSets = $this->api->call('intake_list_datasets',
+            ["coll" => $this->intake_path . ($studyFolder ? '/' . $studyFolder : '')])->data;
+
+        print_r($dataSets);
+        //exit;
 
         // get the total of dataset files
         $totalDatasetFiles = 0;
@@ -105,10 +125,22 @@ class Intake extends MY_Controller
             $totalDatasetFiles += $set->objects;
         }
 
-        $dataErroneousFiles = array();
-        $this->dataset->getErroneousIntakeFiles($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''), $dataErroneousFiles);
+//        $dataErroneousFiles = array();
+//        $this->dataset->getErroneousIntakeFiles($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''), $dataErroneousFiles);
+//        echo '<pre>';
+//        print_r($dataErroneousFiles);
+//        echo '</pre>';
 
-        $totalFileCount = $this->dataset->getIntakeFileCount($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''));
+        $dataErroneousFiles = $this->api->call('intake_list_unrecognized_files',
+            ["coll" => $this->intake_path . ($studyFolder ? '/' . $studyFolder : '')])->data;
+        echo '<pre>';
+        print_r($dataErroneousFiles);
+        echo '</pre>';
+
+
+        //        //$totalFileCount = $this->dataset->getIntakeFileCount($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''));
+        $totalFileCount = $this->api->call('intake_count_total_files', ["coll" => $this->intake_path . ($studyFolder ? '/' . $studyFolder : '')])->data;
+        //print_r($totalFileCount);
 
         $viewParams = array(
             'styleIncludes' => array(
@@ -162,35 +194,35 @@ class Intake extends MY_Controller
         // return a json representation of the result
         $this->output->set_content_type('application/json');
 
-        if(!$this->input->post()){
-            $this->output->set_output(json_encode(array(
-                'result' => 'Invalid request',
-                'hasError' => TRUE
-            )));
-            return;
-        }
+//        if(!$this->input->post()){
+//            $this->output->set_output(json_encode(array(
+//                'result' => 'Invalid request',
+//                'hasError' => TRUE
+//            )));
+//            return;
+//        }
 
         $datasets = $this->input->post('datasets'); // array of folders
         $studyID = $this->input->post('studyID');
 
         // input validation
-        if(!$studyID OR !is_array($datasets)){
-            $this->output->set_output(json_encode(array(
-                'result' => 'Invalid input',
-                'hasError' => TRUE
-            )));
-            return;
-        }
+//        if(!$studyID OR !is_array($datasets)){
+//            $this->output->set_output(json_encode(array(
+//                'result' => 'Invalid input',
+//                'hasError' => TRUE
+//            )));
+//            return;
+//        }
 
         // Only datamanager is allowed to do this
-        $errorMessage='';
-        if(!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed=array($this->user->ROLE_Manager), $errorMessage)){
-            $this->output->set_output(json_encode(array(
-                'result' => $errorMessage,
-                'hasError' => TRUE
-            )));
-            return;
-        }
+//        $errorMessage='';
+//        if(!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed=array($this->user->ROLE_Manager), $errorMessage)){
+//            $this->output->set_output(json_encode(array(
+//                'result' => $errorMessage,
+//                'hasError' => TRUE
+//            )));
+//            return;
+//        }
 
         $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
@@ -200,11 +232,14 @@ class Intake extends MY_Controller
         // per collection find latest lock/freeze-status. Possibly the presented data is outdated.
         foreach($datasets as $datasetId){
             //$output .= ','.$collection;
-            if($result = $this->yodaprods->datasetLock($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetId)){
-                $this->session->set_userdata('alertOnPageReload', pageLoadAlert('success','LOCK_OK', $result));
-                $hasError=TRUE;
-                break;
+            if (FALSE) {
+                if ($result = $this->yodaprods->datasetLock($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetId)) {
+                    $this->session->set_userdata('alertOnPageReload', pageLoadAlert('success', 'LOCK_OK', $result));
+                    $hasError = TRUE;
+                    break;
+                }
             }
+            $this->api->call('intake_lock_dataset', ["path" => $this->intake_path, "dataset_id" => $datasetId]);
         }
 
         $this->output->set_output(json_encode(array(
@@ -269,11 +304,14 @@ class Intake extends MY_Controller
         // per collection find latest lock/freeze-status. Possibly the presented data is outdated.
         foreach($datasets as $datasetId){
             //$output .= ','.$collection;
-            if($result = $this->yodaprods->datasetUnlock($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetId)){
-                $this->session->set_userdata('alertOnPageReload', pageLoadAlert('danger','UNLOCK_NOK', $result));
-                $hasError=TRUE;
-                break;
+            if (FALSE) {
+                if ($result = $this->yodaprods->datasetUnlock($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetId)) {
+                    $this->session->set_userdata('alertOnPageReload', pageLoadAlert('danger', 'UNLOCK_NOK', $result));
+                    $hasError = TRUE;
+                    break;
+                }
             }
+            $this->api->call('intake_unlock_dataset', ["path" => $this->intake_path, "dataset_id" => $datasetId]);
         }
         $this->output->set_output(json_encode(array(
             'result' => $result,
@@ -333,7 +371,12 @@ class Intake extends MY_Controller
         // do save action.
         $this->intake_path = '/'.$this->config->item('rodsServerZone').'/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
-        $result = $this->yodaprods->addCommentToDataset($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetID, $comment);
+//        $result = $this->yodaprods->addCommentToDataset($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetID, $comment);
+
+        $comment_data = $this->api->call('intake_dataset_add_comment',
+            ["coll" => $this->intake_path, "dataset_id" => $datasetID, "comment" => $comment])->data;
+
+        print_r($comment_data);exit;
 
         // Return the new row data so requester can add in comments table
         $this->output->set_output(json_encode(array(
@@ -357,6 +400,20 @@ class Intake extends MY_Controller
     */
     public function scanSelection()
     {
+        $studyID = $this->input->post('studyID');
+        print_r($studyID);
+
+        $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
+
+        $result = $this->api->call('intake_scan_for_datasets',
+            ["coll" => $this->intake_path]);
+
+        print_r($result);
+
+        return;
+        echo "HIER";
+
+
         $hasError=FALSE;
 
         $this->output->enable_profiler(FALSE);
@@ -384,6 +441,7 @@ class Intake extends MY_Controller
             return;
         }
 
+        echo "HIER1";
         // assistant and manager both are allowed to view the details of a dataset.
         $errorMessage='';
         if(!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed=array($this->user->ROLE_Manager,$this->user->ROLE_Assistant), $errorMessage)){

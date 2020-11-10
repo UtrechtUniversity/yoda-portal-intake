@@ -22,8 +22,10 @@ class Reports extends MY_Controller
         $this->load->model('user');
         $this->load->model('dataset');
 
-        $studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
+        $this->load->library('api');
+        $studies = $this->api->call('intake_list_studies')->data;
 
+        // @TODO!! DIt moet Aparte API call worden
         $dmStudies = array();
         // Filter studies only to studies with datamanager permissions
         foreach($studies as $study) {

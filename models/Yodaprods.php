@@ -10,6 +10,7 @@ class YodaProds  {
      * @param $datasetId
      * @return int (0=ok)
      */
+
     static public function datasetLock($iRodsAccount, $root, $datasetId)
     {
         $ruleBody = "
@@ -91,6 +92,7 @@ class YodaProds  {
     {
         $ruleBody = "
             myRule {
+                *status = '';
                 uuYcIntakeScan(*collection1,*status);
                 *status=str(*status);
         }";
@@ -197,38 +199,39 @@ class YodaProds  {
      * @param $iRodsAccount
      * @return array|bool
      */
-    static public function getStudies($iRodsAccount)
-    {
-        $ruleBody = "
-            myRule {
-                uuYcIntakerStudies(*studies);
-                *studies = str(*studies);
-        }";
-
-        try{
-
-            $rule = new ProdsRule(
-                $iRodsAccount,
-                $ruleBody,
-                array(),
-                array(
-                    '*studies'
-                )
-            );
-            $result = $rule->execute();
-
-            $studies = explode(',',$result['*studies']);
-
-            return $studies;
-        }
-        catch(RODSException $e) {
-            // if erroneous => NO permission
-            // var_dump($e->getCodeAbbr());
-
-            return FALSE;
-        }
-        return FALSE;
-    }
+//    static public function getStudies($iRodsAccount)
+//    {
+//
+//        $ruleBody = "
+//            myRule {
+//                uuYcIntakerStudies(*studies);
+//                *studies = str(*studies);
+//        }";
+//
+//        try{
+//
+//            $rule = new ProdsRule(
+//                $iRodsAccount,
+//                $ruleBody,
+//                array(),
+//                array(
+//                    '*studies'
+//                )
+//            );
+//            $result = $rule->execute();
+//
+//            $studies = explode(',',$result['*studies']);
+//
+//            return $studies;
+//        }
+//        catch(RODSException $e) {
+//            // if erroneous => NO permission
+//            // var_dump($e->getCodeAbbr());
+//
+//            return FALSE;
+//        }
+//        return FALSE;
+//    }
 
     /**
      * Get the metadata required for the dataset-table in the intake module.
@@ -239,72 +242,72 @@ class YodaProds  {
      * @param $dataSetInfo
      * @return bool
      */
-    static public function getMetaDataForIntakeDataset($iRodsAccount, $datasetId, &$dataSetInfo)
-    {
-        $ruleBody = "
-            myRule {
-                uuYcQueryDataset(*datasetId, *wave, *expType, *pseudocode, *version, *datasetStatus, *datasetCreateName, *datasetCreateDate, *datasetErrors, *datasetWarnings, *datasetComments,  *objects, *objectErrors, *objectWarnings);
-                *wave = str(*wave);
-                *expType = str(*expType);
-                *pseudocode = str(*pseudocode);
-                *version = str(*version);
-                *datasetStatus = str(*datasetStatus);
-                *datasetCreateName = str(*datasetCreateName);
-                *datasetCreateDate = str(*datasetCreateDate);
-                *datasetErrors = str(*datasetErrors);
-                *datasetWarnings = str(*datasetWarnings);
-                *datasetComments = str(*datasetComments);
-                *objects = str(*objects);
-                *objectErrors = str(*objectErrors);
-                *objectWarnings = str(*objectWarnings);
-       }";
-
-        try{
-            $rule = new ProdsRule(
-                $iRodsAccount,
-                $ruleBody,
-                array(
-                    '*datasetId' => $datasetId,
-                ),
-                array(
-                    '*wave',
-                    '*expType',
-                    '*pseudocode',
-                    '*version',
-                    '*datasetStatus',
-                    '*datasetCreateName',
-                    '*datasetCreateDate',
-                    '*datasetErrors',
-                    '*datasetWarnings',
-                    '*datasetComments',
-                    '*objects',
-                    '*objectErrors',
-                    '*objectWarnings',
-                )
-            );
-            $result = $rule->execute();
-
-            $dataSetInfo['wave'] = $result['*wave'];
-            $dataSetInfo['expType'] = $result['*expType'];
-            $dataSetInfo['pseudocode'] = $result['*pseudocode'];
-            $dataSetInfo['version'] = $result['*version'];
-            $dataSetInfo['datasetStatus'] = $result['*datasetStatus'];
-            $dataSetInfo['datasetCreateName'] = $result['*datasetCreateName'];
-            $dataSetInfo['datasetCreateDate'] = $result['*datasetCreateDate'];
-            $dataSetInfo['datasetErrors'] = $result['*datasetErrors'];
-            $dataSetInfo['datasetWarnings'] = $result['*datasetWarnings'];
-            $dataSetInfo['datasetComments'] = $result['*datasetComments'];
-            $dataSetInfo['objects'] = $result['*objects'];
-            $dataSetInfo['objectErrors'] = $result['*objectErrors'];
-            $dataSetInfo['objectWarnings'] = $result['*objectWarnings'];
-
-            return TRUE;
-        }
-        catch(RODSException $e) {
-            return FALSE;
-        }
-        return FALSE;
-    }
+//    static public function getMetaDataForIntakeDataset($iRodsAccount, $datasetId, &$dataSetInfo)
+//    {
+//        $ruleBody = "
+//            myRule {
+//                uuYcQueryDataset(*datasetId, *wave, *expType, *pseudocode, *version, *datasetStatus, *datasetCreateName, *datasetCreateDate, *datasetErrors, *datasetWarnings, *datasetComments,  *objects, *objectErrors, *objectWarnings);
+//                *wave = str(*wave);
+//                *expType = str(*expType);
+//                *pseudocode = str(*pseudocode);
+//                *version = str(*version);
+//                *datasetStatus = str(*datasetStatus);
+//                *datasetCreateName = str(*datasetCreateName);
+//                *datasetCreateDate = str(*datasetCreateDate);
+//                *datasetErrors = str(*datasetErrors);
+//                *datasetWarnings = str(*datasetWarnings);
+//                *datasetComments = str(*datasetComments);
+//                *objects = str(*objects);
+//                *objectErrors = str(*objectErrors);
+//                *objectWarnings = str(*objectWarnings);
+//       }";
+//
+//        try{
+//            $rule = new ProdsRule(
+//                $iRodsAccount,
+//                $ruleBody,
+//                array(
+//                    '*datasetId' => $datasetId,
+//                ),
+//                array(
+//                    '*wave',
+//                    '*expType',
+//                    '*pseudocode',
+//                    '*version',
+//                    '*datasetStatus',
+//                    '*datasetCreateName',
+//                    '*datasetCreateDate',
+//                    '*datasetErrors',
+//                    '*datasetWarnings',
+//                    '*datasetComments',
+//                    '*objects',
+//                    '*objectErrors',
+//                    '*objectWarnings',
+//                )
+//            );
+//            $result = $rule->execute();
+//
+//            $dataSetInfo['wave'] = $result['*wave'];
+//            $dataSetInfo['expType'] = $result['*expType'];
+//            $dataSetInfo['pseudocode'] = $result['*pseudocode'];
+//            $dataSetInfo['version'] = $result['*version'];
+//            $dataSetInfo['datasetStatus'] = $result['*datasetStatus'];
+//            $dataSetInfo['datasetCreateName'] = $result['*datasetCreateName'];
+//            $dataSetInfo['datasetCreateDate'] = $result['*datasetCreateDate'];
+//            $dataSetInfo['datasetErrors'] = $result['*datasetErrors'];
+//            $dataSetInfo['datasetWarnings'] = $result['*datasetWarnings'];
+//            $dataSetInfo['datasetComments'] = $result['*datasetComments'];
+//            $dataSetInfo['objects'] = $result['*objects'];
+//            $dataSetInfo['objectErrors'] = $result['*objectErrors'];
+//            $dataSetInfo['objectWarnings'] = $result['*objectWarnings'];
+//
+//            return TRUE;
+//        }
+//        catch(RODSException $e) {
+//            return FALSE;
+//        }
+//        return FALSE;
+//    }
 
     /**
      * Completely open query function.

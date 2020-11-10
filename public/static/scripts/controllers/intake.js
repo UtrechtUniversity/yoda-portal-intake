@@ -38,7 +38,7 @@ $(function() {
     });
 
     $('#btn-start-scan').click(function(){
-        var url = YodaPortal.baseUrl + ['intake','scanSelection'].join('/'),
+        var url = Yoda.baseUrl + ['intake','scanSelection'].join('/'),
             collection=$('#collection').val(),
             csrf_key = $('input[name="csrf_yoda"]').val();
 
@@ -49,11 +49,12 @@ $(function() {
         };
 
         inProgressStart('Scanning in progress...');
-
+        console.log('$.post');
         $.post(
             url,
             parameters,
             function (data) {
+                console.log(data);
                 location.reload();
             }
         );
@@ -92,7 +93,7 @@ $(function() {
 
     // datamanager only
     $('#btn-lock').click(function(){
-        var url = YodaPortal.baseUrl + ['intake','lockDatasets'].join('/'),
+        var url = Yoda.baseUrl + ['intake','lockDatasets'].join('/'),
             datasets=[],
             csrf_key = $('input[name="csrf_yoda"]').val();
 
@@ -125,7 +126,7 @@ $(function() {
 
     // datamanager only
     $('#btn-unlock').click(function(){
-        var url = YodaPortal.baseUrl + ['intake','unlockDatasets'].join('/'),
+        var url = Yoda.baseUrl + ['intake','unlockDatasets'].join('/'),
             datasets=[],
             csrf_key = $('input[name="csrf_yoda"]').val();
 
@@ -185,7 +186,7 @@ $(function() {
             var csrf_key = $('input[name="csrf_yoda"]').val();
 
             $.post(
-                YodaPortal.baseUrl + ['intake','saveDatasetComment'].join('/'),
+                Yoda.baseUrl + ['intake','saveDatasetComment'].join('/'),
                 {   "studyID": study,
                     "datasetID":datasetId,
                     "comment": comment,
@@ -264,7 +265,7 @@ function datasetRowClickForDetails(obj, mainTable)
     else {
         // Open this row
         var tbl_id = tr.data('row-id'),
-            url = YodaPortal.baseUrl + ['intake','getDatasetDetailView'].join('/'),
+            url = Yoda.baseUrl + ['intake','getDatasetDetailView'].join('/'),
             csrf_key = $('input[name="csrf_yoda"]').val();
 
         //return;

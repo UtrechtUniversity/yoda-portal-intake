@@ -16,7 +16,11 @@ class Export extends MY_Controller {
         $this->load->model('user');
         $this->load->model('dataset');
 
-        $this->studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
+        $this->load->library('api');
+        $this->studies = $this->api->call('intake_list_studies')->data;
+
+        //$this->studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
+        //$this->studies = $this->intakeapi->intake_list_studies();
 
         $this->load->helper('yoda_intake');
     }
