@@ -83,6 +83,35 @@ class Reports extends MY_Controller
 
         $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
+        echo $studyID;
+
+        echo '<hr>';
+
+        if (false) {
+            echo '<pre>';
+            print_r($this->dataset->vaultDatasetCountsPerStudy($studyID));
+            echo '</pre>';
+
+            $counts = $this->api->call('intake_report_vault_dataset_counts_per_study', ['study_id' => $studyID])->data;
+            echo '<pre>';
+            print_r($counts);
+            echo '</pre>';
+        }
+        echo '<hr><hr>';
+
+        $data = $this->api->call('intake_report_vault_aggregated_info', ['study_id' => $studyID])->data;
+        echo '<pre>';
+        print_r($data);
+        echo '</pre>';
+
+        //api_intake_report_vault_aggregated_info
+
+        echo '<pre>';
+        print_r($this->dataset->vaultAggregatedInfo($studyID));
+        echo '</pre>';
+
+        exit;
+
         $viewParams = array(
             'styleIncludes' => array(
             ),
