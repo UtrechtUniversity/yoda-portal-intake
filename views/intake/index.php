@@ -85,73 +85,27 @@
 <?php if (!isset($alertData->alertNr) || substr($alertData->alertNr,0,6)!='ACCESS'): ?>
 
     <div class="row" id="toprow">
-        <div class="btn-group">
-            <button class="btn btn-outline-secondary dropdown-toggle btn-default" data-toggle="dropdown">
-                <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
-            </button>
-            <div class="dropdown-menu" style="width:300px;padding:5px;">
-                Please select a study:
-                <br/>
-                <table class="table table-striped hover" id="select-study">
-                    <?php foreach($studies as $study): ?>
-                        <tr data-study-url="<?php echo site_url().'intake/index/'.urlencode($study) ?>">
-                            <td >
-                                <i class="fa fa-graduation-cap" aria-hidden="true"></i>
-                            </td>
-                            <td>
-                                <span>
-                                    <?php echo htmlentities($study) ?>
-                                </span>
-                            </td>
-                            <td style="width:10px;">
-                                <?php if($study==$studyID): ?>
-                                    <span class="glyphicon glyphicon-ok"></span>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </table>
-            </div>
-        </div>
-        <?php if($selectableScanFolders): ?>
+        <div class="col-sm-12">
             <div class="btn-group">
-                <button class="btn  btn-outline-secondary dropdown-toggle btn-default" data-toggle="dropdown">
-                    <i class="fa fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
+                <button class="btn btn-outline-secondary dropdown-toggle btn-default" data-toggle="dropdown">
+                    <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
-                    Please select a folder:
+                    Please select a study:
                     <br/>
-                    <br/>
-                    <table class="table table-striped hover" id="select-study-folder">
-                        <tr data-study-folder-url="<?php echo site_url().'intake/index/'.urlencode($studyID); ?>">
-                            <td style="width:10px;">
-                                <span class="glyphicon glyphicon-folder-open pull-left"></span>
-                            </td>
-                            <td colspan="2">
-                                <strong>
-                                    <?php echo htmlentities($studyID); ?>
-                                </strong>
-                            </td>
-                            <td style="width:10px;">
-                                <?php if(!$studyFolder): ?>
-                                    <span class="glyphicon glyphicon-ok"></span>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                        <?php foreach($selectableScanFolders as $folder): ?>
-                            <tr data-study-folder-url="<?php echo site_url().'intake/index/'.urlencode($studyID).'/' .str_replace('+','%20',urlencode($folder)); ?>">
-                                <td>
-                                </td>
-                                <td style="width:10px;">
-                                    <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                    <table class="table table-striped hover" id="select-study">
+                        <?php foreach($studies as $study): ?>
+                            <tr data-study-url="<?php echo site_url().'intake/index/'.urlencode($study) ?>">
+                                <td >
+                                    <i class="fa fa-graduation-cap" aria-hidden="true"></i>
                                 </td>
                                 <td>
                                     <span>
-                                        <?php echo htmlentities($folder); ?>
+                                        <?php echo htmlentities($study) ?>
                                     </span>
                                 </td>
                                 <td style="width:10px;">
-                                    <?php if($folder==$studyFolder): ?>
+                                    <?php if($study==$studyID): ?>
                                         <span class="glyphicon glyphicon-ok"></span>
                                     <?php endif; ?>
                                 </td>
@@ -160,113 +114,118 @@
                     </table>
                 </div>
             </div>
-        <?php endif; ?>
+            <?php if($selectableScanFolders): ?>
+                <div class="btn-group">
+                    <button class="btn  btn-outline-secondary dropdown-toggle btn-default" data-toggle="dropdown">
+                        <i class="fa fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu" style="width:300px;padding:5px;">
+                        Please select a folder:
+                        <br/>
+                        <br/>
+                        <table class="table table-striped hover" id="select-study-folder">
+                            <tr data-study-folder-url="<?php echo site_url().'intake/index/'.urlencode($studyID); ?>">
+                                <td style="width:10px;">
+                                    <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                                </td>
+                                <td colspan="2">
+                                    <strong>
+                                        <?php echo htmlentities($studyID); ?>
+                                    </strong>
+                                </td>
+                                <td style="width:10px;">
+                                    <?php if(!$studyFolder): ?>
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php foreach($selectableScanFolders as $folder): ?>
+                                <tr data-study-folder-url="<?php echo site_url().'intake/index/'.urlencode($studyID).'/' .str_replace('+','%20',urlencode($folder)); ?>">
+                                    <td>
+                                    </td>
+                                    <td style="width:10px;">
+                                        <span class="glyphicon glyphicon-folder-open pull-left"></span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            <?php echo htmlentities($folder); ?>
+                                        </span>
+                                    </td>
+                                    <td style="width:10px;">
+                                        <?php if($folder==$studyFolder): ?>
+                                            <span class="glyphicon glyphicon-ok"></span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    </div>
+                </div>
+            <?php endif; ?>
 
-        <div class="btn-group">
-            <button class="btn btn-outline-secondary btn-default" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary btn-default" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
+            </div>
+
+            <?php if($permissions->manager): ?>
+                <div class="btn-group">
+                    <button class="btn btn-default" id="btn-lock"><span class="glyphicon glyphicon-check"></span> Lock datasets</button>
+                </div>
+                <div class="btn-group">
+                        <button class="btn btn-default" id="btn-unlock"><span class="glyphicon glyphicon-check"></span> Unlock datasets</button>
+                </div>
+                <div class="btn-group">
+                    <a href="<?php echo base_url('intake/reports'); ?>" class="btn btn-info"><span class="glyphicon glyphicon-signal"></span> Reports</a>
+                </div>
+            <?php endif; ?>
+
+            <input type="hidden" id="studyID" value="<?php     echo htmlentities($studyID    , ENT_QUOTES) ?>">
+            <input type="hidden" id="studyFolder" value="<?php echo htmlentities($studyFolder, ENT_QUOTES) ?>">
+            <input type="hidden" id="collection" value="<?php  echo htmlentities($studyFolder, ENT_QUOTES) ?>">
+
         </div>
-
-        <?php if($permissions->manager): ?>
-            <div class="btn-group">
-                <button class="btn btn-default" id="btn-lock"><span class="glyphicon glyphicon-check"></span> Lock datasets</button>
-            </div>
-            <div class="btn-group">
-                    <button class="btn btn-default" id="btn-unlock"><span class="glyphicon glyphicon-check"></span> Unlock datasets</button>
-            </div>
-            <div class="btn-group">
-                <a href="<?php echo base_url('intake/reports'); ?>" class="btn btn-info"><span class="glyphicon glyphicon-signal"></span> Reports</a>
-            </div>
-        <?php endif; ?>
-
-        <input type="hidden" id="studyID" value="<?php     echo htmlentities($studyID    , ENT_QUOTES) ?>">
-        <input type="hidden" id="studyFolder" value="<?php echo htmlentities($studyFolder, ENT_QUOTES) ?>">
-        <input type="hidden" id="collection" value="<?php  echo htmlentities($studyFolder, ENT_QUOTES) ?>">
-
-
     </div>
 
-    <div class="row" id="viewwindow" style="overflow-y: scroll;overflow-x: hidden;">
-        <?php if(!$permissions->manager): ?>
-            <?php include "snippets/table_files_unrecognised.php"; ?>
-        <?php endif; ?>
+    <div class="row" id="viewwindow">
+        <div class="col-sm-12">
+            <?php if(!$permissions->manager): ?>
+                <?php include "snippets/table_files_unrecognised.php"; ?>
+            <?php endif; ?>
 
-        <table id="datatable" class="row-border hover table table-striped" style="width:100%;">
-            <thead>
-                <tr>
-                    <?php if($permissions->manager): ?>
-                        <th class="th-invisible-order"></th>
-                    <?php endif; ?>
-                    <th align="center"><input type="checkbox" class="control-all-cbDataSets"></th>
-                    <th></th>
-                    <th>Status</th>
-                    <th style="width:80px;">Date</th>
-                    <th>Pseudocode</th>
-                    <th>Experiment type</th>
-                    <th>Wave</th>
-                    <th>Version</th>
-                    <th style="text-align: right;">Nr. of files</th>
-                    <th style="text-align: right;">Nr. of errors/<br/>warnings</th>
-                    <th style="text-align: right;">Nr. of <br/>comments</th>
-                    <th>Created by</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php
-                $row=0;
-                foreach ($dataSets as $data):?>
-                    <?php $errors = $data->datasetErrors + $data->objectErrors; ?>
-                    <tr class="detailrow"
-                        data-fullpath="<?php echo htmlentities($data->path, ENT_QUOTES) ?>"
-                        data-target="<?php echo htmlentities(strtoupper($data->datasetStatus), ENT_QUOTES) ?>"
-                        data-row-id="<?php echo $row; $row++; ?>"
-                        data-dataset-id="<?php echo htmlentities($data->dataset_id, ENT_QUOTES); ?>"
-                        data-ref-path="<?php echo htmlentities($data->path, ENT_QUOTES) ?>"
-                        data-error-count="<?php echo $errors; ?>">
-                        <td data-target="<?php echo htmlentities(strtoupper($data->datasetStatus), ENT_QUOTES) ?>">
-                            <?php echo htmlentities(strtoupper($data->datasetStatus)); ?>
-                        </td>
+            <table id="datatable" class="row-border hover table table-striped" style="width:100%;">
+                <thead>
+                    <tr>
                         <?php if($permissions->manager): ?>
-                            <td align="center">
-                                <input type="checkbox">
-                            </td>
+                            <th class="th-invisible-order"></th>
                         <?php endif; ?>
-                        <td></td>
-                        <td>
-                            <div class="datasetstatus_<?php echo strtolower($data->datasetStatus); ?>" title="<?php echo strtoupper($data->datasetStatus); ?>"></div>
-                        </td>
-                        <td><?php echo date('Y-m-d',intval($data->datasetCreateDate)) ?></td>
-                        <td><?php echo htmlentities($data->pseudocode) ?></td>
-                        <td><?php echo htmlentities($data->expType) ?></td>
-                        <td><?php echo htmlentities($data->wave) ?></td>
-                        <td><?php echo htmlentities($data->version) ?></td>
-                        <td style="text-align: right;"><?php echo $data->objects ?></td>
-                        <td style="text-align: right;">
-                            <?php
-                                echo  $errors ? $errors : '-';
-                                echo '/';
-                                $warnings = $data->datasetWarnings + $data->objectWarnings;
-                                echo  $warnings ? $warnings : '-';
-                            ?>
-                        </td>
-                        <td style="text-align: right;">
-                            <?php echo $data->datasetComments ? $data->datasetComments:'-'; ?>
-                        </td>
-                        <td>
-                            <?php echo htmlentities($data->datasetCreateName) ?>
-                        </td>
+                        <th align="center"><input type="checkbox" class="control-all-cbDataSets"></th>
+                        <th></th>
+                        <th>Status</th>
+                        <th style="width:80px;">Date</th>
+                        <th>Pseudocode</th>
+                        <th>Experiment type</th>
+                        <th>Wave</th>
+                        <th>Version</th>
+                        <th style="text-align: right;">Nr. of files</th>
+                        <th style="text-align: right;">Nr. of errors/<br/>warnings</th>
+                        <th style="text-align: right;">Nr. of <br/>comments</th>
+                        <th>Created by</th>
                     </tr>
-                <?php endforeach; ?>
-
-
-            <?php
-             if(false) {
-                $row=0;
-                foreach ($dataSet as $dataset_id=>$data):?>
-                    <?php if(isset($dataSetCreationDate[$dataset_id]) AND $dataSetCreationDate[$dataset_id]): ?>
-                        <tr class="detailrow" data-fullpath="<?php echo htmlentities($data->fullpath, ENT_QUOTES) ?>" data-target="<?php echo htmlentities($data->user, ENT_QUOTES) ?>" data-row-id="<?php echo $row; $row++; ?>"
-                                data-dataset-id="<?php echo htmlentities($dataset_id, ENT_QUOTES); ?>" data-ref-path="<?php echo htmlentities($data->reference_path, ENT_QUOTES) ?>" data-error-count="<?php echo ((isset($datasetAllLevelErrorCounts[$dataset_id]) AND $datasetAllLevelErrorCounts[$dataset_id]) ? $datasetAllLevelErrorCounts[$dataset_id] : '0' ) ?>">
-                            <td data-target="<?php echo htmlentities($data->user, ENT_QUOTES) ?>">
-                                <?php echo htmlentities($data->user) ?>
+                </thead>
+                <tbody>
+                <?php
+                    $row=0;
+                    foreach ($dataSets as $data):?>
+                        <?php $errors = $data->datasetErrors + $data->objectErrors; ?>
+                        <tr class="detailrow"
+                            data-fullpath="<?php echo htmlentities($data->path, ENT_QUOTES) ?>"
+                            data-target="<?php echo htmlentities(strtoupper($data->datasetStatus), ENT_QUOTES) ?>"
+                            data-row-id="<?php echo $row; $row++; ?>"
+                            data-dataset-id="<?php echo htmlentities($data->dataset_id, ENT_QUOTES); ?>"
+                            data-ref-path="<?php echo htmlentities($data->path, ENT_QUOTES) ?>"
+                            data-error-count="<?php echo $errors; ?>">
+                            <td data-target="<?php echo htmlentities(strtoupper($data->datasetStatus), ENT_QUOTES) ?>">
+                                <?php echo htmlentities(strtoupper($data->datasetStatus)); ?>
                             </td>
                             <?php if($permissions->manager): ?>
                                 <td align="center">
@@ -275,41 +234,84 @@
                             <?php endif; ?>
                             <td></td>
                             <td>
-                                <div class="datasetstatus_<?php echo strtolower($data->status); ?>" title="<?php echo $data->status ?>"></div>
+                                <div class="datasetstatus_<?php echo strtolower($data->datasetStatus); ?>" title="<?php echo strtoupper($data->datasetStatus); ?>"></div>
                             </td>
-                            <td><?php echo date('Y-m-d',$dataSetCreationDate[$dataset_id]); ?></td>
+                            <td><?php echo date('Y-m-d',intval($data->datasetCreateDate)) ?></td>
                             <td><?php echo htmlentities($data->pseudocode) ?></td>
-                            <td><?php echo htmlentities($data->experiment_type) ?></td>
+                            <td><?php echo htmlentities($data->expType) ?></td>
                             <td><?php echo htmlentities($data->wave) ?></td>
                             <td><?php echo htmlentities($data->version) ?></td>
-                            <td style="text-align: right;"><?php echo $dataSetFileCount[$dataset_id]; ?></td>
-                            <td style="text-align: right;">
-                                 <?php
-                                   echo  ((isset($datasetAllLevelErrorCounts[$dataset_id]) AND $datasetAllLevelErrorCounts[$dataset_id]) ? $datasetAllLevelErrorCounts[$dataset_id] : '-' );
-                                   echo '/';
-                                   echo  ((isset($datasetAllLevelWarningCounts[$dataset_id]) AND $datasetAllLevelWarningCounts[$dataset_id]) ? $datasetAllLevelWarningCounts[$dataset_id] : '-' );
-                                ?>
-                             </td>
+                            <td style="text-align: right;"><?php echo $data->objects ?></td>
                             <td style="text-align: right;">
                                 <?php
-                                    $count = count($topLevelDistinctCountVals[$dataset_id]['comment']);
-                                    echo $count ? $count:'-';
+                                    echo  $errors ? $errors : '-';
+                                    echo '/';
+                                    $warnings = $data->datasetWarnings + $data->objectWarnings;
+                                    echo  $warnings ? $warnings : '-';
                                 ?>
                             </td>
-                            <td><?php echo htmlentities($dataSetCreator[$dataset_id]) ?></td>
+                            <td style="text-align: right;">
+                                <?php echo $data->datasetComments ? $data->datasetComments:'-'; ?>
+                            </td>
+                            <td>
+                                <?php echo htmlentities($data->datasetCreateName) ?>
+                            </td>
                         </tr>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            <?php
-                }
-            ?>
-            </tbody>
-        </table>
+                    <?php endforeach; ?>
 
-        <?php if($permissions->manager): ?>
-            <?php include "snippets/table_files_unrecognised.php"; ?>
-        <?php endif; ?>
 
+                <?php
+                 if(false) {
+                    $row=0;
+                    foreach ($dataSet as $dataset_id=>$data):?>
+                        <?php if(isset($dataSetCreationDate[$dataset_id]) AND $dataSetCreationDate[$dataset_id]): ?>
+                            <tr class="detailrow" data-fullpath="<?php echo htmlentities($data->fullpath, ENT_QUOTES) ?>" data-target="<?php echo htmlentities($data->user, ENT_QUOTES) ?>" data-row-id="<?php echo $row; $row++; ?>"
+                                    data-dataset-id="<?php echo htmlentities($dataset_id, ENT_QUOTES); ?>" data-ref-path="<?php echo htmlentities($data->reference_path, ENT_QUOTES) ?>" data-error-count="<?php echo ((isset($datasetAllLevelErrorCounts[$dataset_id]) AND $datasetAllLevelErrorCounts[$dataset_id]) ? $datasetAllLevelErrorCounts[$dataset_id] : '0' ) ?>">
+                                <td data-target="<?php echo htmlentities($data->user, ENT_QUOTES) ?>">
+                                    <?php echo htmlentities($data->user) ?>
+                                </td>
+                                <?php if($permissions->manager): ?>
+                                    <td align="center">
+                                        <input type="checkbox">
+                                    </td>
+                                <?php endif; ?>
+                                <td></td>
+                                <td>
+                                    <div class="datasetstatus_<?php echo strtolower($data->status); ?>" title="<?php echo $data->status ?>"></div>
+                                </td>
+                                <td><?php echo date('Y-m-d',$dataSetCreationDate[$dataset_id]); ?></td>
+                                <td><?php echo htmlentities($data->pseudocode) ?></td>
+                                <td><?php echo htmlentities($data->experiment_type) ?></td>
+                                <td><?php echo htmlentities($data->wave) ?></td>
+                                <td><?php echo htmlentities($data->version) ?></td>
+                                <td style="text-align: right;"><?php echo $dataSetFileCount[$dataset_id]; ?></td>
+                                <td style="text-align: right;">
+                                     <?php
+                                       echo  ((isset($datasetAllLevelErrorCounts[$dataset_id]) AND $datasetAllLevelErrorCounts[$dataset_id]) ? $datasetAllLevelErrorCounts[$dataset_id] : '-' );
+                                       echo '/';
+                                       echo  ((isset($datasetAllLevelWarningCounts[$dataset_id]) AND $datasetAllLevelWarningCounts[$dataset_id]) ? $datasetAllLevelWarningCounts[$dataset_id] : '-' );
+                                    ?>
+                                 </td>
+                                <td style="text-align: right;">
+                                    <?php
+                                        $count = count($topLevelDistinctCountVals[$dataset_id]['comment']);
+                                        echo $count ? $count:'-';
+                                    ?>
+                                </td>
+                                <td><?php echo htmlentities($dataSetCreator[$dataset_id]) ?></td>
+                            </tr>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php
+                    }
+                ?>
+                </tbody>
+            </table>
+
+            <?php if($permissions->manager): ?>
+                <?php include "snippets/table_files_unrecognised.php"; ?>
+            <?php endif; ?>
+        </div>
     </div>
 
     <div id="select-generic-modal" class="modal fade"  tabindex="-2" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
