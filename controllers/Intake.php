@@ -117,6 +117,7 @@ class Intake extends MY_Controller
                 'css/intake.css',
                 'css/treetable/jquery.treetable.css',
                 'css/treetable/jquery.treetable.theme.default.css',
+                'lib/font-awesome/css/font-awesome.css',
             ),
             'scriptIncludes' => array(
                 'scripts/jquery.dataTables.min.js',

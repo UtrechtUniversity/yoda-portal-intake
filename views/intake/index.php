@@ -48,7 +48,7 @@
     <div class="row page-header" style="margin-top:0px;">
         <div class="col-sm-6">
                 <h1>
-                    <span class="glyphicon glyphicon-folder-open"></span>
+                    <i class="fa fa-folder-open" aria-hidden="true"></i>
                     <?php echo htmlentities($title); ?>
                 </h1>
                 <?php echo htmlentities($intakePath . ($studyFolder?'/'.$studyFolder:'')); ?>
@@ -86,8 +86,8 @@
 
     <div class="row" id="toprow">
         <div class="btn-group">
-            <button class="btn  btn-small dropdown-toggle btn-default" data-toggle="dropdown">
-                <span class="glyphicon glyphicon-education"></span> Change study <span class="caret"></span>
+            <button class="btn btn-outline-secondary dropdown-toggle btn-default" data-toggle="dropdown">
+                <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
             </button>
             <div class="dropdown-menu" style="width:300px;padding:5px;">
                 Please select a study for your Yoda Intake Area:
@@ -97,7 +97,7 @@
                     <?php foreach($studies as $study): ?>
                         <tr data-study-url="<?php echo site_url().'intake/index/'.urlencode($study) ?>">
                             <td >
-                                <span class="glyphicon glyphicon-education pull-left"></span>
+                                <i class="fa fa-graduation-cap" aria-hidden="true"></i>
                             </td>
                             <td>
                                 <span>
@@ -116,8 +116,8 @@
         </div>
         <?php if($selectableScanFolders): ?>
             <div class="btn-group">
-                <button class="btn  btn-small dropdown-toggle btn-default" data-toggle="dropdown">
-                    <span class="glyphicon glyphicon-folder-open"></span> Change folder <span class="caret"></span>
+                <button class="btn  btn-outline-secondary dropdown-toggle btn-default" data-toggle="dropdown">
+                    <i class="fa fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
                     Please select a folder:
@@ -164,7 +164,7 @@
         <?php endif; ?>
 
         <div class="btn-group">
-            <button class="btn btn-small btn-default" id="btn-start-scan"><span class="glyphicon glyphicon-zoom-in"></span> Scan all files</button>
+            <button class="btn btn-small btn-default" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
         </div>
 
         <?php if($permissions->manager): ?>
