@@ -90,8 +90,7 @@
                 <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
             </button>
             <div class="dropdown-menu" style="width:300px;padding:5px;">
-                Please select a study for your Yoda Intake Area:
-                <br/>
+                Please select a study:
                 <br/>
                 <table class="table table-striped hover" id="select-study">
                     <?php foreach($studies as $study): ?>
@@ -164,7 +163,7 @@
         <?php endif; ?>
 
         <div class="btn-group">
-            <button class="btn btn-small btn-default" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
+            <button class="btn btn-outline-secondary btn-default" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
         </div>
 
         <?php if($permissions->manager): ?>
