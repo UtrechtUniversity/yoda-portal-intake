@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">
                         <span class="glyphicon glyphicon-ok"></span> OK
                     </button>
                 </div>
@@ -87,7 +87,7 @@
     <div class="row" id="toprow">
         <div class="col-sm-12">
             <div class="btn-group">
-                <button class="btn btn-outline-secondary dropdown-toggle btn-default" data-toggle="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
                     <i class="fa fa-graduation-cap" aria-hidden="true"></i> Change study <span class="caret"></span>
                 </button>
                 <div class="dropdown-menu" style="width:300px;padding:5px;">
@@ -116,7 +116,7 @@
             </div>
             <?php if($selectableScanFolders): ?>
                 <div class="btn-group">
-                    <button class="btn  btn-outline-secondary dropdown-toggle btn-default" data-toggle="dropdown">
+                    <button class="btn  btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-folder-open" aria-hidden="true"></i> Change folder <span class="caret"></span>
                     </button>
                     <div class="dropdown-menu" style="width:300px;padding:5px;">
@@ -163,15 +163,15 @@
             <?php endif; ?>
 
             <div class="btn-group">
-                <button class="btn btn-outline-secondary btn-default" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
+                <button class="btn btn-outline-secondary" id="btn-start-scan"><i class="fa fa-search-plus" aria-hidden="true"></i> Scan all files</button>
             </div>
 
             <?php if($permissions->manager): ?>
                 <div class="btn-group">
-                    <button class="btn btn-default" id="btn-lock"><span class="glyphicon glyphicon-check"></span> Lock datasets</button>
+                    <button class="btn btn-outline-secondary" id="btn-lock"><span class="glyphicon glyphicon-check"></span> Lock datasets</button>
                 </div>
                 <div class="btn-group">
-                        <button class="btn btn-default" id="btn-unlock"><span class="glyphicon glyphicon-check"></span> Unlock datasets</button>
+                        <button class="btn btn-outline-secondary" id="btn-unlock"><span class="glyphicon glyphicon-check"></span> Unlock datasets</button>
                 </div>
                 <div class="btn-group">
                     <a href="<?php echo base_url('intake/reports'); ?>" class="btn btn-info"><span class="glyphicon glyphicon-signal"></span> Reports</a>
