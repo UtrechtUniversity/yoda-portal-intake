@@ -91,7 +91,7 @@
 
     </div>
     <div class="row">
-        <div class="col-xs-6">
+        <div class="col-sm-6">
             <h1>Raw</h1>
             <table width="100%" class="table-striped">
                 <thead>
@@ -123,7 +123,7 @@
                 <?php if(!$counter) { echo "<i>No data found.</i>"; } ?>
             </table>
         </div>
-        <div class="col-xs-6">
+        <div class="col-sm-6">
             <h1>Processed</h1>
             <table width="100%" class="table-striped">
                 <thead>

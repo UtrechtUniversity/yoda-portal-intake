@@ -30,7 +30,7 @@ $(function() {
         "bLengthChange": false,
         "bFilter": false,
         "order": [[ 6, "desc" ]],
-        "sDom": "<'row'<'col-xs-6'T><'col-xs-6'f>r>t<'row'<'col-xs-6'i><'col-xs-6'p>>",
+        "sDom": "<'row'<'col-sm-6'T><'col-sm-6'f>r>t<'row'<'col-sm-6'i><'col-sm-6'p>>",
         "sPaginationType": "bootstrap",
         "fnInitComplete": function(oSettings, json) {
             //$('.dataTables_info span').text($('#totalSignups').text());
