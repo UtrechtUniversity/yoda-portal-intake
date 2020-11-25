@@ -51,7 +51,7 @@
                     <i class="fa fa-folder-open" aria-hidden="true"></i>
                     <?php echo htmlentities($title); ?>
                 </h1>
-                <?php echo htmlentities($intakePath . ($studyFolder?'/'.$studyFolder:'')); ?>
+                <p><?php echo htmlentities($intakePath . ($studyFolder?'/'.$studyFolder:'')); ?></p>
         </div>
         <div class="col-sm-6">
             <div class="progress_indicator" style="display:none;">
@@ -122,7 +122,6 @@
                     <div class="dropdown-menu" style="width:300px;padding:5px;">
                         Please select a folder:
                         <br/>
-                        <br/>
                         <table class="table table-striped hover" id="select-study-folder">
                             <tr data-study-folder-url="<?php echo site_url().'intake/index/'.urlencode($studyID); ?>">
                                 <td style="width:10px;">
@@ -186,7 +185,7 @@
         </div>
     </div>
 
-    <div class="row" id="viewwindow">
+    <div class="row mt-2" id="viewwindow">
         <div class="col-sm-12">
             <?php if(!$permissions->manager): ?>
                 <?php include "snippets/table_files_unrecognised.php"; ?>
