@@ -1,4 +1,9 @@
 $(function() {
+    get_studies();
+    get_studies_dm();
+    get_datasets('grp-intake-initial');
+    get_unrecognized_files('grp-intake-initial')
+
     var tableUnrecognised = $('#datatable_unrecognised').DataTable({
         "language": {
             "sEmptyTable":     "No data found",
@@ -334,4 +339,37 @@ function modalDialog(title, url)
 
     $('.modal-body iframe', modal).show();
     $('#select-generic-modal').modal('show');
+}
+
+async function get_studies()
+{
+    let result = await Yoda.call('intake_list_studies', {});
+    console.log(result);
+}
+
+async function get_studies_dm()
+{
+    let result = await Yoda.call('intake_list_dm_studies', {});
+    console.log(result);
+}
+
+async function get_datasets(coll)
+{
+    let result = await Yoda.call('intake_list_datasets',
+        {
+            coll: Yoda.basePath + '/' + coll
+        })
+
+    console.log(result);
+}
+
+
+async function get_unrecognized_files(coll)
+{
+    let result = await Yoda.call('intake_list_unrecognized_files',
+    {
+        coll: Yoda.basePath + '/' + coll
+    })
+
+    console.log(result);
 }

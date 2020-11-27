@@ -12,9 +12,7 @@ class Export extends MY_Controller {
         parent::__construct();
 
         $this->load->config('config');
-        $this->load->model('yodaprods');
         $this->load->model('user');
-        $this->load->model('dataset');
 
         $this->load->library('api');
         $this->studies = $this->api->call('intake_list_studies')->data;
@@ -40,12 +38,13 @@ class Export extends MY_Controller {
             return FALSE;
         }
 
-        if(!$this->yodaprods->isGroupMember($this->rodsuser->getRodsAccount(), $this->user->PERM_GroupDataManager . $studyID, $this->rodsuser->getUsername())){
+        if(!$this->user->isGroupMember($this->rodsuser->getRodsAccount(), $this->user->PERM_GroupDataManager . $studyID, $this->rodsuser->getUsername())){
             echo "You have no rights for this report of this study";
             return FALSE;
         }
 
-        $exportData = $this->dataset->exportVaultDatasetInfo($studyID);
+//        $exportData = $this->dataset->exportVaultDatasetInfo($studyID);
+        $exportDataAPI = $this->api->call('intake_report_export_study_data', ['study_id'=>$studyID])->data;
 
         echo '"Study"';
         echo ",";
@@ -68,7 +67,8 @@ class Export extends MY_Controller {
         echo '"DatasetFiles"';
         echo "\r\n";
 
-        foreach($exportData as $data) {
+        foreach($exportDataAPI as $dataClass) {
+            $data = (array) $dataClass;
             echo $this->_expFormatString($studyID);
             echo ",";
             echo $this->_expFormatString($data['wave']);
