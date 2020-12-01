@@ -17,21 +17,7 @@ class Intake extends MY_Controller
 
         $this->load->config('config');
         $this->load->model('user');
-//        $this->load->model('dataset');
-
-        //$this->studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
-
-        //print_r($this->studies);
-
         $this->load->library('api');
-
-//        $this->studies = $this->intakeapi->intake_list_studies();
-//
-//        print_r($this->studies);
-//        echo '<hr>';
-//
-//        print_r($this->api->call('intake_list_studies')->data);
-//        echo '<hr>';
 
         $this->studies = $this->api->call('intake_list_studies')->data;
 
@@ -94,8 +80,6 @@ class Intake extends MY_Controller
         foreach($dir->getChildDirs() as $folder){
             $validFolders[]=$folder->getName();
         }
-
-        #$this->data['selectableScanFolders'] = $validFolders;  // folders that can be checked for scanning
 
         $studyFolder = urldecode($studyFolder);
 
@@ -176,35 +160,16 @@ class Intake extends MY_Controller
         // return a json representation of the result
         $this->output->set_content_type('application/json');
 
-//        if(!$this->input->post()){
-//            $this->output->set_output(json_encode(array(
-//                'result' => 'Invalid request',
-//                'hasError' => TRUE
-//            )));
-//            return;
-//        }
+        if(!$this->input->post()){
+            $this->output->set_output(json_encode(array(
+                'result' => 'Invalid request',
+                'hasError' => TRUE
+            )));
+            return;
+        }
 
         $datasets = $this->input->post('datasets'); // array of folders
         $studyID = $this->input->post('studyID');
-
-        // input validation
-//        if(!$studyID OR !is_array($datasets)){
-//            $this->output->set_output(json_encode(array(
-//                'result' => 'Invalid input',
-//                'hasError' => TRUE
-//            )));
-//            return;
-//        }
-
-        // Only datamanager is allowed to do this
-//        $errorMessage='';
-//        if(!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed=array($this->user->ROLE_Manager), $errorMessage)){
-//            $this->output->set_output(json_encode(array(
-//                'result' => $errorMessage,
-//                'hasError' => TRUE
-//            )));
-//            return;
-//        }
 
         $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
@@ -277,14 +242,6 @@ class Intake extends MY_Controller
         $result=0;
         // per collection find latest lock/freeze-status. Possibly the presented data is outdated.
         foreach($datasets as $datasetId){
-            //$output .= ','.$collection;
-//            if (FALSE) {
-//                if ($result = $this->yodaprods->datasetUnlock($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetId)) {
-//                    $this->session->set_userdata('alertOnPageReload', pageLoadAlert('danger', 'UNLOCK_NOK', $result));
-//                    $hasError = TRUE;
-//                    break;
-//                }
-//            }
             $this->api->call('intake_unlock_dataset', ["path" => $this->intake_path, "dataset_id" => $datasetId]);
         }
         $this->output->set_output(json_encode(array(
@@ -345,12 +302,8 @@ class Intake extends MY_Controller
         // do save action.
         $this->intake_path = '/'.$this->config->item('rodsServerZone').'/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
-//        $result = $this->yodaprods->addCommentToDataset($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetID, $comment);
-
         $comment_data = $this->api->call('intake_dataset_add_comment',
             ["coll" => $this->intake_path, "dataset_id" => $datasetID, "comment" => $comment])->data;
-
-//        print_r($comment_data);exit;
 
         // Return the new row data so requester can add in comments table
         $this->output->set_output(json_encode(array(
@@ -387,10 +340,6 @@ class Intake extends MY_Controller
             return;
         }
         else {
-
-//        echo "HIER";
-
-
             $hasError = FALSE;
 
             $this->output->enable_profiler(FALSE);
@@ -507,27 +456,12 @@ class Intake extends MY_Controller
             )));
             return;
         }
-// nieuw
-//        $strPath = $this->input->post('path');
-//        $datasetID = $this->input->post('datasetID');
 
         $result = $this->api->call('intake_dataset_get_details',
             ["coll" => $strPath, "dataset_id" => $datasetID]);
-//
-//        print_r($result);
-//
-//        exit;
-//
-//        $temp = (array)$result->data->files;
-//
-//        print_r($temp);
-//        exit;
-        $temp = $result->data->files;
-        $this->data['pathItems'] = $temp;
 
-//        print_r($temp); exit;
+        $this->data['pathItems'] = $result->data->files;
 
-        //$this->data['content'] = 'intake/intake/index';
         $this->data['tbl_id'] = $tbl_id;
 
         $scannedByWhen = $result->data->scanned;
