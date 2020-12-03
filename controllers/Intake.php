@@ -460,7 +460,11 @@ class Intake extends MY_Controller
         $result = $this->api->call('intake_dataset_get_details',
             ["coll" => $strPath, "dataset_id" => $datasetID]);
 
-        $this->data['pathItems'] = $result->data->files;
+        $orderedArr = (array)$result->data->files;
+
+        ksort($orderedArr, SORT_STRING);
+
+        $this->data['pathItems'] = $orderedArr;
 
         $this->data['tbl_id'] = $tbl_id;
 
