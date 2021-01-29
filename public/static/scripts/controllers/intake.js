@@ -31,7 +31,8 @@ $(function() {
             { "data": "status" },
             { "data": "creator" }
         ],
-        "iDisplayLength": 20,
+        "iDisplayLength": 50,
+        "bPaginate": false,
         "bLengthChange": false,
         "bFilter": false,
         "order": [[ 6, "desc" ]],

@@ -42,8 +42,9 @@ $(document).ready(function() {
              { "data": "creator" }
          ],
          "iDisplayLength": 50,
-		 "bLengthChange": false,
-		 "bFilter": false,
+         "bPaginate": false,
+         "bLengthChange": false,
+	 "bFilter": false,
          "columnDefs": [
              { "visible": false, "targets": 0 },
              { "type": "alt-string", "targets": 3 }

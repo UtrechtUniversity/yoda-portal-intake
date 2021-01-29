@@ -90,7 +90,7 @@ class Intake extends MY_Controller
         }
 
         if ($studyFolder) { // change the actual folder when person selected a different point of reference.
-            $dir = new ProdsDir($this->rodsuser->getRodsAccount(), $this->intake_path . '/' . $studyFolder);
+            $dir = new ProdsDir($rodsAccount, $this->intake_path . '/' . $studyFolder);
         }
 
         $dataSets = $this->api->call('intake_list_datasets',
