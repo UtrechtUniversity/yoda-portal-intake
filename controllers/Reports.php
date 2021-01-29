@@ -18,12 +18,12 @@ class Reports extends MY_Controller
         $this->load->config('config');
         $this->load->config('module'); // load the module info as a config file
 
-        $this->load->model('yodaprods');
         $this->load->model('user');
-        $this->load->model('dataset');
+        $this->load->library('api');
 
-        $studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
+        $studies = $this->api->call('intake_list_studies')->data;
 
+        // @TODO!! DIt moet Aparte API call worden
         $dmStudies = array();
         // Filter studies only to studies with datamanager permissions
         foreach($studies as $study) {
@@ -81,6 +81,10 @@ class Reports extends MY_Controller
 
         $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
+        $counts = $this->api->call('intake_report_vault_dataset_counts_per_study', ['study_id' => $studyID])->data;
+
+        $data = $this->api->call('intake_report_vault_aggregated_info', ['study_id' => $studyID])->data;
+
         $viewParams = array(
             'styleIncludes' => array(
             ),
@@ -92,8 +96,8 @@ class Reports extends MY_Controller
             'moduleGlyph' => $this->config->item('module-glyph'),
             'studies' => $this->studies,
             'intakePath' => $this->intake_path,
-            'datasetTypeCounts' => $this->dataset->vaultDatasetCountsPerStudy($studyID),
-            'aggregatedInfo' => $this->dataset->vaultAggregatedInfo($studyID),
+            'datasetTypeCounts' => $counts,
+            'aggregatedInfo' => $data,
             'studyID' => $studyID,
             'studyFolder' => '',
             'title' => 'VAULT: Study ' . $studyID,

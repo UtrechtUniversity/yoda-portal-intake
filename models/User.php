@@ -52,8 +52,8 @@ class User  {
      */
     public function getIntakeStudyPermissions($studyID){
         return (object)array(
-            'assistant' => get_instance()->yodaprods->isGroupMember(get_instance()->rodsuser->getRodsAccount(), $this->PERM_GroupAssistant . $studyID ,  get_instance()->rodsuser->getUsername()),
-            'manager'   => get_instance()->yodaprods->isGroupMember(get_instance()->rodsuser->getRodsAccount(), $this->PERM_GroupDataManager . $studyID, get_instance()->rodsuser->getUsername()),
+            'assistant' => $this->isGroupMember(get_instance()->rodsuser->getRodsAccount(), $this->PERM_GroupAssistant . $studyID ,  get_instance()->rodsuser->getUsername()),
+            'manager'   => $this->isGroupMember(get_instance()->rodsuser->getRodsAccount(), $this->PERM_GroupDataManager . $studyID, get_instance()->rodsuser->getUsername()),
         );
     }
 
@@ -84,6 +84,43 @@ class User  {
         }
 
         $errorMessage = self::PERMISSION_ERROR_No_Permission;
+        return FALSE;
+    }
+
+    /**
+     * Find whether a user is member of the given group.
+     *
+     * @param $iRodsAccount
+     * @param $groupName
+     * @param $userName
+     * @return bool
+     */
+    static public function isGroupMember($iRodsAccount,$groupName, $userName){
+        $ruleBody = "
+            myRule {
+                uuGroupUserExists(*group, *user, false, *member);
+                *member = str(*member);
+        }";
+
+        try{
+            $rule = new ProdsRule(
+                $iRodsAccount,
+                $ruleBody,
+                array(
+                    '*group' => $groupName,
+                    '*user'  => $userName
+                ),
+                array(
+                    '*member'
+                )
+            );
+            $result = $rule->execute();
+            return ($result['*member'] === "true");
+        }
+        catch(RODSException $e) {
+            // if erroneous => NO permission
+            return FALSE;
+        }
         return FALSE;
     }
 }

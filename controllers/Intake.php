@@ -16,11 +16,10 @@ class Intake extends MY_Controller
         );
 
         $this->load->config('config');
-        $this->load->model('yodaprods');
         $this->load->model('user');
-        $this->load->model('dataset');
+        $this->load->library('api');
 
-        $this->studies = $this->yodaprods->getStudies($this->rodsuser->getRodsAccount());
+        $this->studies = $this->api->call('intake_list_studies')->data;
 
         $this->load->helper('yoda_intake');
     }
@@ -82,8 +81,6 @@ class Intake extends MY_Controller
             $validFolders[]=$folder->getName();
         }
 
-        #$this->data['selectableScanFolders'] = $validFolders;  // folders that can be checked for scanning
-
         $studyFolder = urldecode($studyFolder);
 
         if($studyFolder AND !in_array($studyFolder,$validFolders)){
@@ -96,8 +93,8 @@ class Intake extends MY_Controller
             $dir = new ProdsDir($this->rodsuser->getRodsAccount(), $this->intake_path . '/' . $studyFolder);
         }
 
-        $dataSets = array();
-        $this->dataset->getIntakeDataSets($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''), $dataSets);
+        $dataSets = $this->api->call('intake_list_datasets',
+            ["coll" => $this->intake_path . ($studyFolder ? '/' . $studyFolder : '')])->data;
 
         // get the total of dataset files
         $totalDatasetFiles = 0;
@@ -105,10 +102,11 @@ class Intake extends MY_Controller
             $totalDatasetFiles += $set->objects;
         }
 
-        $dataErroneousFiles = array();
-        $this->dataset->getErroneousIntakeFiles($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''), $dataErroneousFiles);
+        $dataErroneousFiles = $this->api->call('intake_list_unrecognized_files',
+            ["coll" => $this->intake_path . ($studyFolder ? '/' . $studyFolder : '')])->data;
 
-        $totalFileCount = $this->dataset->getIntakeFileCount($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''));
+        //        //$totalFileCount = $this->dataset->getIntakeFileCount($this->intake_path . ($studyFolder ? '/' . $studyFolder : ''));
+        $totalFileCount = $this->api->call('intake_count_total_files', ["coll" => $this->intake_path . ($studyFolder ? '/' . $studyFolder : '')])->data;
 
         $viewParams = array(
             'styleIncludes' => array(
@@ -174,25 +172,6 @@ class Intake extends MY_Controller
         $datasets = $this->input->post('datasets'); // array of folders
         $studyID = $this->input->post('studyID');
 
-        // input validation
-        if(!$studyID OR !is_array($datasets)){
-            $this->output->set_output(json_encode(array(
-                'result' => 'Invalid input',
-                'hasError' => TRUE
-            )));
-            return;
-        }
-
-        // Only datamanager is allowed to do this
-        $errorMessage='';
-        if(!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed=array($this->user->ROLE_Manager), $errorMessage)){
-            $this->output->set_output(json_encode(array(
-                'result' => $errorMessage,
-                'hasError' => TRUE
-            )));
-            return;
-        }
-
         $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
         $this->session->set_userdata('alertOnPageReload', pageLoadAlert('success','LOCK_OK'));
@@ -200,12 +179,7 @@ class Intake extends MY_Controller
         $result=0;
         // per collection find latest lock/freeze-status. Possibly the presented data is outdated.
         foreach($datasets as $datasetId){
-            //$output .= ','.$collection;
-            if($result = $this->yodaprods->datasetLock($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetId)){
-                $this->session->set_userdata('alertOnPageReload', pageLoadAlert('success','LOCK_OK', $result));
-                $hasError=TRUE;
-                break;
-            }
+            $this->api->call('intake_lock_dataset', ["path" => $this->intake_path, "dataset_id" => $datasetId]);
         }
 
         $this->output->set_output(json_encode(array(
@@ -269,12 +243,7 @@ class Intake extends MY_Controller
         $result=0;
         // per collection find latest lock/freeze-status. Possibly the presented data is outdated.
         foreach($datasets as $datasetId){
-            //$output .= ','.$collection;
-            if($result = $this->yodaprods->datasetUnlock($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetId)){
-                $this->session->set_userdata('alertOnPageReload', pageLoadAlert('danger','UNLOCK_NOK', $result));
-                $hasError=TRUE;
-                break;
-            }
+            $this->api->call('intake_unlock_dataset', ["path" => $this->intake_path, "dataset_id" => $datasetId]);
         }
         $this->output->set_output(json_encode(array(
             'result' => $result,
@@ -334,7 +303,8 @@ class Intake extends MY_Controller
         // do save action.
         $this->intake_path = '/'.$this->config->item('rodsServerZone').'/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
 
-        $result = $this->yodaprods->addCommentToDataset($this->rodsuser->getRodsAccount(), $this->intake_path, $datasetID, $comment);
+        $comment_data = $this->api->call('intake_dataset_add_comment',
+            ["coll" => $this->intake_path, "dataset_id" => $datasetID, "comment" => $comment])->data;
 
         // Return the new row data so requester can add in comments table
         $this->output->set_output(json_encode(array(
@@ -358,63 +328,79 @@ class Intake extends MY_Controller
     */
     public function scanSelection()
     {
-        $hasError=FALSE;
-
-        $this->output->enable_profiler(FALSE);
-
-        $this->output->set_content_type('application/json');
-
-        // must be a post
-        if(!$this->input->post()){
-            $this->output->set_output(json_encode(array(
-                'result' => 'Invalid request',
-                'hasError' => TRUE
-            )));
-            return;
-        }
-
-        $collection = $this->input->post('collection'); // used to be an array of folders .. OBSOLETE!! @TODO: change to single folder
         $studyID = $this->input->post('studyID');
 
-        // input validation
-        if(!$studyID){
-            $this->output->set_output(json_encode(array(
-                'result' => 'Invalid input',
-                'hasError' => TRUE
-            )));
-            return;
-        }
-
-        // assistant and manager both are allowed to view the details of a dataset.
-        $errorMessage='';
-        if(!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed=array($this->user->ROLE_Manager,$this->user->ROLE_Assistant), $errorMessage)){
-            $this->output->set_output(json_encode(array(
-                'result' => $errorMessage,
-                'hasError' => TRUE
-            )));
-            return;
-        }
-
         $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
-        // scan subfolder only
-        if(strlen($collection)){
-            $this->intake_path .= '/' . $collection;
+
+        if (1==1) {
+            $result = $this->api->call('intake_scan_for_datasets',
+                ["coll" => $this->intake_path]);
+
+            print_r($result);
+
+            return;
         }
+        else {
+            $hasError = FALSE;
+
+            $this->output->enable_profiler(FALSE);
+
+            $this->output->set_content_type('application/json');
+
+            // must be a post
+            if (!$this->input->post()) {
+                $this->output->set_output(json_encode(array(
+                    'result' => 'Invalid request',
+                    'hasError' => TRUE
+                )));
+                return;
+            }
+
+            $collection = $this->input->post('collection'); // used to be an array of folders .. OBSOLETE!! @TODO: change to single folder
+            $studyID = $this->input->post('studyID');
+
+            // input validation
+            if (!$studyID) {
+                $this->output->set_output(json_encode(array(
+                    'result' => 'Invalid input',
+                    'hasError' => TRUE
+                )));
+                return;
+            }
+
+            // assistant and manager both are allowed to view the details of a dataset.
+            $errorMessage = '';
+            if (!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed = array($this->user->ROLE_Manager, $this->user->ROLE_Assistant), $errorMessage)) {
+                $this->output->set_output(json_encode(array(
+                    'result' => $errorMessage,
+                    'hasError' => TRUE
+                )));
+                return;
+            }
+
+            $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
+            // scan subfolder only
+            if (strlen($collection)) {
+                $this->intake_path .= '/' . $collection;
+            }
 
 
-        if($result = $this->yodaprods->scanIrodsCollection($this->rodsuser->getRodsAccount(), $this->intake_path)){ // Study-root
-            $this->session->set_userdata('alertOnPageReload', pageLoadAlert('danger','SCAN_NOK',$result)); // for presentation purposes after page reload
-            $hasError=TRUE ;
-        }
-        else{
-            $this->session->set_userdata('alertOnPageReload', pageLoadAlert('success','SCAN_OK'));
-        }
+            $result = $this->api->call('intake_scan_for_datasets',
+                ["coll" => $this->intake_path]);
 
-        $this->output->set_output(json_encode(array(
-            'result' => $result,
-            'hasError' => $hasError
-        )));
-        return;
+//            if ($result = $this->yodaprods->scanIrodsCollection($this->rodsuser->getRodsAccount(), $this->intake_path)) { // Study-root
+//                $this->session->set_userdata('alertOnPageReload', pageLoadAlert('danger', 'SCAN_NOK', $result)); // for presentation purposes after page reload
+//                $hasError = TRUE;
+//            } else {
+//                $this->session->set_userdata('alertOnPageReload', pageLoadAlert('success', 'SCAN_OK'));
+//            }
+
+            $this->output->set_output(json_encode(array(
+                'result' => $result,
+                'hasError' => $hasError
+            )));
+            return;
+        }
     }
 
     /*
@@ -472,81 +458,32 @@ class Intake extends MY_Controller
             return;
         }
 
-        $rodsAccount = $this->rodsuser->getRodsAccount();
-        $home = new ProdsDir($rodsAccount, $strPath);
+        $result = $this->api->call('intake_dataset_get_details',
+            ["coll" => $strPath, "dataset_id" => $datasetID]);
 
-        $pathItems = array();
-        $this->_getNewPathInfo($pathItems, $home, $parentNodeId="0", $datasetID);
+        $orderedArr = (array)$result->data->files;
 
-        $this->data['pathItems'] = $pathItems;
+        ksort($orderedArr, SORT_STRING);
 
-        //$this->data['content'] = 'intake/intake/index';
+        $this->data['pathItems'] = $orderedArr;
+
         $this->data['tbl_id'] = $tbl_id;
 
-        $scannedByWhen = '';
+        $scannedByWhen = $result->data->scanned;
+
         // prepare data for the error, warning and comments  table.
-        $datasetErrors = array();
-        $datasetWarnings = array();
+        $datasetErrors = (array)$result->data->dataset_errors;
+        $datasetWarnings = (array)$result->data->dataset_warnings; #array();
+
+        // comment handling
         $datasetComments = array();
-        // For getting rid of double information:
-        $datasetIDsProcessed = array(); // dataset ids that have been processed already
-        // Get rid off double information in the case of files sitting on the same level and having the same data n times.
-        // Temporary storage of info is required as it might be double.
-        // Can only be taken into account after knowing whether the dataset-id has not been processed yet.
-        // Beware, the metadata we're looking at here, is already limited to toplevel-information only.
-        // dataset_error, dataset_warning, comment are only linked to toplevel-datasets.
-        foreach($pathItems as $nodeId=>$item){
-            $tempErrors = array(); // temp storage of metadata
-            $tempWarnings = array();
-            $tempComments = array();
-            $datasetID = null;
-            foreach($item->meta as $m){
-                switch ($m->name){
-                    case 'scanned':
-                        $scannedByWhen = $m->value;
-                        break;
-                    case 'dataset_id':
-                        $datasetID = $m->value;
-                        break;
-                    case 'dataset_error':
-                        $tempErrors[] = $m->value;
-                        break;
-                    case 'dataset_warning':
-                        $tempWarnings[] = $m->value;
-                        break;
-                    case 'comment':
-                        $tempComments[] = $m->value;
-                        break;
-                }
-            }
-
-            // temp set is complete. If not already present, than add to output-arrays.
-            if($datasetID AND !in_array($datasetID, $datasetIDsProcessed)){
-                $datasetIDsProcessed[]=$datasetID;
-
-                // errors
-                foreach($tempErrors as $error){
-                    $datasetErrors[] = $error;
-                }
-                // warnings
-                foreach($tempWarnings as $warning){
-                    $datasetWarnings[] = $warning;
-                }
-                // comments
-                foreach($tempComments as $comment){
-                    $commentParts = explode(':', $comment, 3); //0=name, 1=timestamp, 2=comment
-                    array_push($datasetComments, array(
-                        'name' => $commentParts[0],
-                        'time' => $commentParts[1],
-                        'comment' => $commentParts[2]));
-                }
-            }
+        foreach((array)$result->data->comments as $comment){
+            $commentParts = explode(':', $comment, 3); //0=name, 1=timestamp, 2=comment
+            array_push($datasetComments, array(
+                'name' => $commentParts[0],
+                'time' => $commentParts[1],
+                'comment' => $commentParts[2]));
         }
-
-        // order comments by time
-        usort($datasetComments, function($a, $b) {
-            return $a['time'] - $b['time'];
-        });
 
         $this->data['datasetPath'] = $strPath;
         $this->data['scannedByWhen'] = explode(':',$scannedByWhen);
@@ -558,80 +495,11 @@ class Intake extends MY_Controller
 
         $strTableDef = $this->load->view('intake/intake/snippets/dataset_detail_view', $this->data,true);
 
-
         $this->output->set_output(json_encode(array(
              'output' => $strTableDef,
             'hasError' => $hasError
         )));
         return;
-    }
-
-    private function _getNewPathInfo(&$pathItems, $prodsParentPath, $parentNodeId, $datasetID)
-    {
-        // There is a possibility that the parent node holds all toplevel info.
-        // Therefore, take this into account but only on the first go, i.e. the root of all.
-        if(count($pathItems)== 0) {
-            $topLevelMeta = $prodsParentPath->getMeta();
-            foreach($topLevelMeta as $tlmeta){
-                if($tlmeta->name=='dataset_id' AND $tlmeta->value==$datasetID){
-                    $pathItems['']= (object) array("name" => '',
-                        'isFolder' => true,
-                        'parent_id' => '',
-                        'meta' => $topLevelMeta
-                    );
-                }
-            }
-        }
-
-        $folders = $prodsParentPath->getChildDirs();
-
-        $subLevel = 0;
-
-        foreach($folders as $folder){
-            // check if is of correct dataset!!
-            $metaData = $folder->getMeta();
-            foreach($metaData as $meta){
-                if($meta->name=='dataset_id' AND $meta->value==$datasetID){
-                    $nodeId = $parentNodeId . '.' . $subLevel;
-
-                    $pathItems[$nodeId]= (object) array("name"=>$folder->getName(),
-                        'isFolder'=> true,
-                        'parent_id' => $parentNodeId,
-                        'meta' => $folder->getMeta()
-                    );
-
-                    $this->_getNewPathInfo($pathItems, $folder, $nodeId, $datasetID);
-
-                    $subLevel++;
-                }
-            }
-        }
-
-        $files = $prodsParentPath->getChildFiles();
-        $usedFileNames = array();
-        foreach($files as $file){
-            // check if is of correct dataset!!
-
-            // Due to replication same file names can occur more than once.
-            //echo '<br>' . $file->getName();
-            if (!in_array($file->getName(), $usedFileNames)) {
-                $usedFileNames[] = $file->getName();
-                $metaData = $file->getMeta();
-                foreach ($metaData as $meta) {
-                    if ($meta->name == 'dataset_id' AND $meta->value == $datasetID) {
-                        $nodeId = $parentNodeId . '.' . $subLevel;
-
-                        $pathItems[$nodeId] = (object)array("name" => $file->getName(),
-                            'isFolder' => false,
-                            'parent_id' => $parentNodeId,
-                            'meta' => $file->getMeta());
-                        $subLevel++;
-
-                        break;
-                    }
-                }
-            }
-        }
     }
 }
 

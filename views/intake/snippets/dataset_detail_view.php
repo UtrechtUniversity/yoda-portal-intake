@@ -89,6 +89,8 @@
         </tbody>
     </table>
 
+    <br>
+
     <h4>File information</h4>
     <table id="tree<?php echo $tbl_id?>" class="row-border hover table table-striped tbl-fullwidth table-outside-borders ">
         <thead>
@@ -99,6 +101,8 @@
         </thead>
         <tbody>
         <?php $row=0; ?>
+
+
         <?php foreach($pathItems as $nodeId=>$item): ?>
             <?php
                 // exclude highest level when parent_id AND nodeId is empty.
@@ -112,25 +116,25 @@
                         <td valign="top"><?php echo htmlentities($item->name, ENT_QUOTES, 'UTF-8'); ?></td>
                         <td valign="top">
                         <?php
-                            $fileLevelMetaTags = array('error', 'warning');
-                            $info = array();
-
-                            foreach($item->meta as $m){
-                                if( in_array($m->name, $fileLevelMetaTags)){
-                                    if(!isset($info [$m->name])){
-                                        $info [$m->name] = "<br>" . htmlentities($m->value);
-                                    }
-                                    else{
-                                        $info [$m->name] .= "<br>" . htmlentities($m->value);
-                                    }
-                                }
-                            }
-                            $newLine='';
-                            if(isset($info['error'])) {echo "<strong>Error(s)</strong>".$info['error'];$newLine='<br/>';}
-                            if(isset($info['warning'])) {
-                                echo $newLine;
-                                echo "<strong>Warning(s)</strong>".$info['warning'];}
-
+                              // Compilation of errors/warnings
+                              $error_messages = '';
+                              foreach($item->errors as $error) {
+                                  $error_messages .= '<br>' . $error;
+                              }
+                              $warning_messages = '';
+                              foreach($item->warnings as $warning) {
+                                  $warning_messages .= '<br>' . $warning;
+                              }
+                              // Presentation of errors / warnings
+                              $newLine = '';
+                              if ($error_messages) {
+                                  echo "<strong>Error(s)</strong>".$error_messages;
+                                  $newLine='<br/>';
+                              }
+                              if ($warning_messages) {
+                                  echo $newLine;
+                                  echo "<strong>Warning(s)</strong>".$warning_messages;
+                              }
                         ?>
                         </td>
                     </tr>
