@@ -44,16 +44,17 @@
         $this->session->unset_userdata('alertOnPageReload');
 ?>
 
-<?php if (!$alertData): ?>
     <div class="row page-header" style="margin-top:0px;">
-        <div class="col-sm-6">
+        <div class="col-sm-12">
                 <h1>
                     <i class="fa fa-folder-open" aria-hidden="true"></i>
                     <?php echo htmlentities($title); ?>
                 </h1>
                 <p><?php echo htmlentities($intakePath . ($studyFolder?'/'.$studyFolder:'')); ?></p>
         </div>
-        <div class="col-sm-6">
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
             <div class="progress_indicator" style="display:none;">
                 <h1 class="pull-right">
                     Scanning process in progress...
@@ -62,20 +63,21 @@
             </div>
         </div>
     </div>
-<?php endif; ?>
 
 <?php // kept seperately as this are maybe not mutually exclusive and this might change in the future ?>
 
 <?php if($alertData): ?>
     <div class="row">
-        <div class="alert alert-<?php echo $alertData->alertType; ?>">
-            <button type="button" class="close" data-hide="alert">&times;</button>
-            <div class="info_text">
-                <?php echo htmlentities($lang[$alertData->alertNr]);  ?>
-                <?php if($alertData->alertSubNr): ?>
-                    <br/>
-                    Error code: <?php echo $alertData->alertSubNr; ?>
-                <?php endif;  ?>
+        <div class="col-sm-12">
+            <div class="alert alert-<?php echo $alertData->alertType; ?>">
+                <button type="button" class="close" data-hide="alert">&times;</button>
+                <div class="info_text">
+                    <?php echo htmlentities($lang[$alertData->alertNr]);  ?>
+                    <?php if($alertData->alertSubNr): ?>
+                        <br/>
+                        Error code: <?php echo $alertData->alertSubNr; ?>
+                    <?php endif;  ?>
+                </div>
             </div>
         </div>
 
