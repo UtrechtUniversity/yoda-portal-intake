@@ -327,80 +327,49 @@ class Intake extends MY_Controller
          Returns json representation of succes or not
     */
     public function scanSelection()
-    {
-        $studyID = $this->input->post('studyID');
+    {   $hasError=FALSE;
 
-        $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
-
-        if (1==1) {
-            $result = $this->api->call('intake_scan_for_datasets',
-                ["coll" => $this->intake_path]);
-
-            print_r($result);
-
-            return;
-        }
-        else {
-            $hasError = FALSE;
-
-            $this->output->enable_profiler(FALSE);
-
-            $this->output->set_content_type('application/json');
-
-            // must be a post
-            if (!$this->input->post()) {
-                $this->output->set_output(json_encode(array(
-                    'result' => 'Invalid request',
-                    'hasError' => TRUE
-                )));
-                return;
-            }
-
-            $collection = $this->input->post('collection'); // used to be an array of folders .. OBSOLETE!! @TODO: change to single folder
-            $studyID = $this->input->post('studyID');
-
-            // input validation
-            if (!$studyID) {
-                $this->output->set_output(json_encode(array(
-                    'result' => 'Invalid input',
-                    'hasError' => TRUE
-                )));
-                return;
-            }
-
-            // assistant and manager both are allowed to view the details of a dataset.
-            $errorMessage = '';
-            if (!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed = array($this->user->ROLE_Manager, $this->user->ROLE_Assistant), $errorMessage)) {
-                $this->output->set_output(json_encode(array(
-                    'result' => $errorMessage,
-                    'hasError' => TRUE
-                )));
-                return;
-            }
-
-            $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
-            // scan subfolder only
-            if (strlen($collection)) {
-                $this->intake_path .= '/' . $collection;
-            }
-
-
-            $result = $this->api->call('intake_scan_for_datasets',
-                ["coll" => $this->intake_path]);
-
-//            if ($result = $this->yodaprods->scanIrodsCollection($this->rodsuser->getRodsAccount(), $this->intake_path)) { // Study-root
-//                $this->session->set_userdata('alertOnPageReload', pageLoadAlert('danger', 'SCAN_NOK', $result)); // for presentation purposes after page reload
-//                $hasError = TRUE;
-//            } else {
-//                $this->session->set_userdata('alertOnPageReload', pageLoadAlert('success', 'SCAN_OK'));
-//            }
-
+        // must be a post
+        if(!$this->input->post()){
             $this->output->set_output(json_encode(array(
-                'result' => $result,
-                'hasError' => $hasError
+                'result' => 'Invalid request',
+                'hasError' => TRUE
             )));
             return;
         }
+
+        $studyID = $this->input->post('studyID');
+        $collection = $this->input->post('collection');
+
+        // input validation
+        if(!$studyID){
+            $this->output->set_output(json_encode(array(
+                'result' => 'Invalid input',
+                'hasError' => TRUE
+            )));
+            return;
+        }
+
+        // assistant and manager both are allowed to view the details of a dataset.
+        $errorMessage='';
+        if(!$this->user->validateIntakeStudyPermissions($studyID, $permissionsAllowed=array($this->user->ROLE_Manager,$this->user->ROLE_Assistant), $errorMessage)){
+            $this->output->set_output(json_encode(array(
+                'result' => $errorMessage,
+                'hasError' => TRUE
+            )));
+            return;
+        }
+
+        $this->intake_path = '/' . $this->config->item('rodsServerZone') . '/home/' . $this->config->item('INTAKEPATH_StudyPrefix') . $studyID;
+        if(strlen($collection)){
+            $this->intake_path .= '/' . $collection;
+        }
+
+        $result = $this->api->call('intake_scan_for_datasets',
+                ["coll" => $this->intake_path]);
+
+        print_r($result);
+
     }
 
     /*
