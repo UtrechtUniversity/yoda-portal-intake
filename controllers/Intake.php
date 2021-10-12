@@ -179,7 +179,7 @@ class Intake extends MY_Controller
         $result=0;
         // per collection find latest lock/freeze-status. Possibly the presented data is outdated.
         foreach($datasets as $datasetId){
-            $this->api->call('intake_lock_dataset', ["path" => $this->intake_path, "dataset_id" => $datasetId]);
+            $this->api->call('intake_lock_dataset', ["path" => $this->intake_path, "dataset_ids" => $datasetId]);
         }
 
         $this->output->set_output(json_encode(array(
