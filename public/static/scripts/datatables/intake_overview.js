@@ -42,7 +42,7 @@ $(document).ready(function() {
              { "data": "creator" }
          ],
          "iDisplayLength": 50,
-         "bPaginate": false,
+         "bPaginate": true,
          "bLengthChange": false,
 	 "bFilter": false,
          "columnDefs": [
