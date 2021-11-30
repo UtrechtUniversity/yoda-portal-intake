@@ -241,10 +241,10 @@ class Intake extends MY_Controller
         $this->session->set_userdata('alertOnPageReload', pageLoadAlert('success','UNLOCK_OK'));
 
         $result=0;
-        // per collection find latest lock/freeze-status. Possibly the presented data is outdated.
-        foreach($datasets as $datasetId){
-            $this->api->call('intake_unlock_dataset', ["path" => $this->intake_path, "dataset_id" => $datasetId]);
-        }
+
+        $dataset_ids = implode(",", $datasets);
+        $this->api->call('intake_unlock_dataset', ["path" => $this->intake_path, "dataset_ids" => $dataset_ids]);
+
         $this->output->set_output(json_encode(array(
             'result' => $result,
             'hasError' => $hasError
